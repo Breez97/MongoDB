@@ -19,16 +19,68 @@ def availableCollections(collections):
     return listAvailableCollections
 
 
+def addingVacancyCollection(collectionName, companyNameEntry, vacancyDescriptionEntry, salaryEntry, statusEntry):
+    if collectionName == 'VacancyDocument':
+        companyNameAdd = companyNameEntry.get()
+        vacancyDescriptionAdd = vacancyDescriptionEntry.get("1.0", "end-1c")
+        salaryAdd = salaryEntry.get()
+        statusAdd = statusEntry.get()
+        if(companyNameAdd == '' or vacancyDescriptionAdd == '' or salaryAdd == '' or statusAdd == ''):
+            showerror(title='Ошибка', message='Заполните все данные')
+        else:
+            showinfo(title='Инфо', message='Данные успешно добавлены')
+            dictAdd = {'Title': companyNameAdd, 'VacancyDescription': vacancyDescriptionAdd, 'Salary': salaryAdd, 'Status': statusAdd}
+            database['DB'][f'{collectionName}'].insert_one(dictAdd)
+
+
 def createWindow(collectionName):
     root = Tk()
+
+    def buttonBackClicked():
+        root.destroy()
+        funcWindow(collectionName)
+    
+    def buttonAddClicked():
+        if(collectionName == 'VacancyDocument'):
+            addingVacancyCollection(collectionName, companyNameEntry, vacancyDescriptionEntry, salaryEntry, statusEntry)
 
     currentCollection = Label(root, text=f'Выбранная коллекция : {collectionName}', font='Arial 12 bold', bg='#FFE4C4')
     currentCollection.pack(pady=10)
 
+    formFrame = Frame(root, bg='#FFE4C4')
+    formFrame.pack(expand=True)
+
+    if collectionName == 'VacancyDocument':
+        companyName = Label(formFrame, text='Название компании : ', font='Arial 12 bold', bg='#FFE4C4')
+        companyName.grid(row=0, column=0, sticky='w')
+        companyNameEntry = Entry(formFrame, font='Arial 12')
+        companyNameEntry.grid(row=0, column=1, sticky='w', pady=5)
+
+        vacancyDescription = Label(formFrame, text='Описание компании : ', font='Arial 12 bold', bg='#FFE4C4')
+        vacancyDescription.grid(row=1, column=0, sticky='w')
+        vacancyDescriptionEntry = Text(formFrame, font='Arial 12', width=20, height=3)
+        vacancyDescriptionEntry.grid(row=1, column=1, sticky='w', pady=5)
+
+        salary = Label(formFrame, text='Размер зарплаты : ', font='Arial 12 bold', bg='#FFE4C4')
+        salary.grid(row=2, column=0, sticky='w')
+        salaryEntry = Entry(formFrame, font='Arial 12')
+        salaryEntry.grid(row=2, column=1, sticky='w', pady=5)
+
+        status = Label(formFrame, text='Статус : ', font='Arial 12 bold', bg='#FFE4C4')
+        status.grid(row=3, column=0, sticky='w')
+        statusEntry = Entry(formFrame, font='Arial 12')
+        statusEntry.grid(row=3, column=1, sticky='w', pady=5)
     
+    buttonAdd = Button(root, text='Добавить', command=buttonAddClicked)
+    buttonAdd.pack(pady=5)
+    buttonAdd.config(font='Arial 12 bold', bg='#FFCA8A')
+
+    buttonBack = Button(root, text='Вернуться назад', command=buttonBackClicked)
+    buttonBack.pack(pady=5)
+    buttonBack.config(font='Arial 12 bold', bg='#FFCA8A')
 
     root.title('Добавление новых данных')
-    root.geometry(f'400x400+550+250')
+    root.geometry(f'400x300+550+250')
     root.resizable(False, False)
     root['bg'] = '#FFE4C4'
     root.mainloop()
@@ -45,7 +97,7 @@ def readWindow(collectionName):
     currentCollection.pack(pady=10)
 
     allRecords = database['DB'][f'{collectionName}'].find()
-    xSize = 600
+    ySize = 150
     if collectionName == 'VacancyDocument':
         length = 0
         columns = ('Title', 'VacancyDescription', 'Salary', 'Status')
@@ -64,6 +116,7 @@ def readWindow(collectionName):
         table.column('#4', width=100)
         for record in allRecords:
             length += 1
+            ySize += 50
             title = record['Title']
             vacancyDescription = record['VacancyDescription']
             salary = record['Salary']
@@ -92,6 +145,7 @@ def readWindow(collectionName):
         table.column('#5', width=50)
         for record in allRecords:
             length += 1
+            ySize += 50
             companyName = record['CompanyName']
             companyDescription = record['CompanyDescription']
             addressCity = record['AddressCity']
@@ -121,6 +175,7 @@ def readWindow(collectionName):
         table.column('#5', width=150)
         for record in allRecords:
             length += 1
+            ySize += 50
             name = record['Name']
             gender = record['Gender']
             dateOfBirth = record['DateOfBirth']
@@ -135,7 +190,8 @@ def readWindow(collectionName):
     buttonBack.config(font='Arial 12 bold', bg='#FFCA8A')
 
     root.title('Просмотр данных')
-    root.geometry(f'{xSize}x300+550+250')
+    root.geometry(f'600x{ySize}+550+250')
+    root.resizable(True, False)
     root['bg'] = '#FFE4C4'
     root.mainloop()
 
@@ -215,20 +271,18 @@ def funcWindow(collectionName):
     root.mainloop()
 
 #Подключение к окну выбора функции
-def connectionFuncWindow(nameCollection):    
-    #print(database['DB'][f'{nameCollection}'].find_one({"Name": "Elizabeth Rutland"}))
-    funcWindow(nameCollection)
+def connectionFuncWindow(collectionName):
+    funcWindow(collectionName)
 
 
 #Главное окно для выбора коллекции для подключения
 def mainUI():
-    global screenWidth, screenHeight
 
     #Кнопка подключения
     def buttonClicked():
-        nameCollection = comboBoxCollections.get()
+        collectionName = comboBoxCollections.get()
         root.destroy()
-        connectionFuncWindow(nameCollection)
+        connectionFuncWindow(collectionName)
 
     sizeY = windowSize(collections)
     root = Tk()
