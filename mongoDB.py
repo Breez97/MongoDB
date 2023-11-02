@@ -1,37 +1,4 @@
-from tkinter import *
-from tkinter import ttk
-from pymongo import MongoClient
-from tkinter.messagebox import showerror, showinfo
-
-#Изменение размера окна в зависимости от количества коллекций
-def windowSize(collections):
-    resizeY = 75
-    for i in range(0, len(collections)):
-        resizeY += 50
-    return resizeY
-
-#Получение списка доступных коллекций
-def availableCollections(collections):
-    listAvailableCollections = ''
-    for i in range(0, len(collections)):
-        listAvailableCollections += f'{i + 1}. {collections[i]}'
-        if(i != len(collections) - 1):
-            listAvailableCollections += '\n\n'
-    return listAvailableCollections
-
-#Функция добавления вакансий (главная коллекция)
-def addingVacancyCollection(collectionName, companyNameEntry, vacancyDescriptionEntry, salaryEntry, statusEntry):
-    if collectionName == 'VacancyDocument':
-        companyNameAdd = companyNameEntry.get()
-        vacancyDescriptionAdd = vacancyDescriptionEntry.get("1.0", "end-1c")
-        salaryAdd = salaryEntry.get()
-        statusAdd = statusEntry.get()
-        if(companyNameAdd == '' or vacancyDescriptionAdd == '' or salaryAdd == '' or statusAdd == ''):
-            showerror(title='Ошибка', message='Заполните все данные')
-        else:
-            showinfo(title='Инфо', message='Данные успешно добавлены')
-            dictAdd = {'Title': companyNameAdd, 'VacancyDescription': vacancyDescriptionAdd, 'Salary': salaryAdd, 'Status': statusAdd}
-            database['DB'][f'{collectionName}'].insert_one(dictAdd)
+from common import *
 
 #Окно добавления записей
 def createWindow(collectionName):
@@ -42,8 +9,11 @@ def createWindow(collectionName):
         funcWindow(collectionName)
     
     def buttonAddClicked():
-        if(collectionName == 'VacancyDocument'):
-            addingVacancyCollection(collectionName, companyNameEntry, vacancyDescriptionEntry, salaryEntry, statusEntry)
+        if collectionName == 'VacancyDocument':
+            addingVacancyCollection(vacancyNameEntry, vacancyDescriptionEntry, salaryEntry, statusEntry)
+        if collectionName == 'EmployerDocument':
+            currentTitle = comboBoxTitles.get()
+            addingEmployerCollection(currentTitle, companyNameEntry, companyDescriptionEntry, addressCityEntry, addressStreetEntry, addressHouseEntry)
 
     currentCollection = Label(root, text=f'Выбранная коллекция : {collectionName}', font='Arial 12 bold', bg='#FFE4C4')
     currentCollection.pack(pady=10)
@@ -51,13 +21,19 @@ def createWindow(collectionName):
     formFrame = Frame(root, bg='#FFE4C4')
     formFrame.pack(expand=True)
 
-    if collectionName == 'VacancyDocument':
-        companyName = Label(formFrame, text='Название компании : ', font='Arial 12 bold', bg='#FFE4C4')
-        companyName.grid(row=0, column=0, sticky='w')
-        companyNameEntry = Entry(formFrame, font='Arial 12')
-        companyNameEntry.grid(row=0, column=1, sticky='w', pady=5)
+    records = database['DB']['VacancyDocument'].find()
+    titles = []
+    for record in records:
+        titles.append(record['Title'])
 
-        vacancyDescription = Label(formFrame, text='Описание компании : ', font='Arial 12 bold', bg='#FFE4C4')
+    if collectionName == 'VacancyDocument':
+        ySize = 300
+        vacancyName = Label(formFrame, text='Название вакансии : ', font='Arial 12 bold', bg='#FFE4C4')
+        vacancyName.grid(row=0, column=0, sticky='w')
+        vacancyNameEntry = Entry(formFrame, font='Arial 12')
+        vacancyNameEntry.grid(row=0, column=1, sticky='w', pady=5)
+
+        vacancyDescription = Label(formFrame, text='Описание вакансии : ', font='Arial 12 bold', bg='#FFE4C4')
         vacancyDescription.grid(row=1, column=0, sticky='w')
         vacancyDescriptionEntry = Text(formFrame, font='Arial 12', width=20, height=3)
         vacancyDescriptionEntry.grid(row=1, column=1, sticky='w', pady=5)
@@ -72,6 +48,67 @@ def createWindow(collectionName):
         statusEntry = Entry(formFrame, font='Arial 12')
         statusEntry.grid(row=3, column=1, sticky='w', pady=5)
     
+    if collectionName == 'EmployerDocument':
+        ySize = 400
+
+        vacancyName = Label(formFrame, text='Название вакансии :', font='Arial 12 bold', bg='#FFE4C4')
+        vacancyName.grid(row=0, column=0, sticky='w')
+        titlesVar = StringVar(value=titles[0])
+        comboBoxTitles = ttk.Combobox(formFrame, font='Arial 12', textvariable=titlesVar, values=titles, state='readonly')
+        comboBoxTitles.grid(row=0, column=1, sticky='w')
+
+        companyName = Label(formFrame, text='Название компании : ', font='Arial 12 bold', bg='#FFE4C4')
+        companyName.grid(row=1, column=0, sticky='w')
+        companyNameEntry = Entry(formFrame, font='Arial 12')
+        companyNameEntry.grid(row=1, column=1, sticky='w', pady=5)
+
+        companyDescription = Label(formFrame, text='Описание компании : ', font='Arial 12 bold', bg='#FFE4C4')
+        companyDescription.grid(row=2, column=0, sticky='w')
+        companyDescriptionEntry = Text(formFrame, font='Arial 12', width=20, height=3)
+        companyDescriptionEntry.grid(row=2, column=1, sticky='w', pady=5)
+
+        addressCity = Label(formFrame, text='Город : ', font='Arial 12 bold', bg='#FFE4C4')
+        addressCity.grid(row=3, column=0, sticky='w')
+        addressCityEntry = Entry(formFrame, font='Arial 12')
+        addressCityEntry.grid(row=3, column=1, sticky='w', pady=5)
+
+        addressStreet = Label(formFrame, text='Улица : ', font='Arial 12 bold', bg='#FFE4C4')
+        addressStreet.grid(row=4, column=0, sticky='w')
+        addressStreetEntry = Entry(formFrame, font='Arial 12')
+        addressStreetEntry.grid(row=4, column=1, sticky='w', pady=5)
+
+        addressHouse = Label(formFrame, text='Дом : ', font='Arial 12 bold', bg='#FFE4C4')
+        addressHouse.grid(row=5, column=0, sticky='w')
+        addressHouseEntry = Entry(formFrame, font='Arial 12')
+        addressHouseEntry.grid(row=5, column=1, sticky='w', pady=5)
+    
+    if collectionName == 'CandidateDocument':
+        ySize = 400
+        
+        vacancyName = Label(formFrame, text='Название вакансии :', font='Arial 12 bold', bg='#FFE4C4')
+        vacancyName.grid(row=0, column=0, sticky='w')
+        titlesVar = StringVar(value=titles[0])
+        comboBoxTitles = ttk.Combobox(formFrame, font='Arial 12', textvariable=titlesVar, values=titles, state='readonly')
+        comboBoxTitles.grid(row=0, column=1, sticky='w')
+
+        candidateName = Label(formFrame, text='Имя Фамилия :', font='Arial 12 bold', bg='#FFE4C4')
+        candidateName.grid(row=1, column=0, sticky='w')
+        candidateNameEntry = Entry(formFrame, font='Arial 12')
+        candidateNameEntry.grid(row=1, column=1, sticky='w')
+
+        gender = Label(formFrame, text='Пол :', font='Arial 12 bold', bg='#FFE4C4')
+        gender.grid(row=2, column=0, sticky='w')
+        genderEntry = Entry(formFrame, font='Arial 12')
+        genderEntry.grid(row=2, column=1, sticky='w')
+
+        dateOfBirth = Label(formFrame, text='Дата рождения :', font='Arial 12 bold', bg='#FFE4C4')
+        dateOfBirth.grid(row=3, column=0, sticky='w')
+        dateOfBirthEntry = Entry(formFrame, font='Arial 12')
+        dateOfBirthEntry.grid(row=3, column=1, sticky='w')
+
+        stage = Label(formFrame, text='Опыт работы :', font='Arial 12 bold', bg='#FFE4C4')
+        stage.grid(row=4, column=0, sticky='w')
+
     buttonAdd = Button(root, text='Добавить', command=buttonAddClicked)
     buttonAdd.pack(pady=5)
     buttonAdd.config(font='Arial 12 bold', bg='#FFCA8A')
@@ -81,7 +118,7 @@ def createWindow(collectionName):
     buttonBack.config(font='Arial 12 bold', bg='#FFCA8A')
 
     root.title('Добавление новых данных')
-    root.geometry(f'400x300+550+250')
+    root.geometry(f'450x{ySize}+550+250')
     root.resizable(False, False)
     root['bg'] = '#FFE4C4'
     root.mainloop()
@@ -104,85 +141,111 @@ def readWindow(collectionName):
         columns = ('Title', 'VacancyDescription', 'Salary', 'Status')
         table = ttk.Treeview(columns=columns, show='headings')
         table.pack()
+
         style = ttk.Style()
         style.configure("Treeview", rowheight=50)
+
         table.tag_configure('data', background="#EDD1AF")
         table.heading('Title', text='Название')
         table.heading('VacancyDescription', text='Описание вакансии')
         table.heading('Salary', text='Зарплата')
         table.heading('Status', text='Статус')
+
         table.column('#1', width=100)
         table.column('#2', width=200)
         table.column('#3', width=100)
         table.column('#4', width=100)
+        
         for record in allRecords:
             length += 1
             ySize += 50
+
             title = record['Title']
             vacancyDescription = record['VacancyDescription']
             salary = record['Salary']
             status = record['Status']
+
             parsedRecord = (title, vacancyDescription, salary, status)
             table.insert('', END, values=parsedRecord, tags=('data',))
         table['height'] = length
     
     if collectionName == 'EmployerDocument':
         length = 0
-        columns = ('CompanyName', 'CompanyDescription', 'AddressCity', 'AddressStreet', 'AddressHouse')
+        columns = ('VacancyName', 'CompanyName', 'CompanyDescription', 'AddressCity', 'AddressStreet', 'AddressHouse')
         table = ttk.Treeview(columns=columns, show='headings')
         table.pack()
+
         style = ttk.Style()
         style.configure("Treeview", rowheight=50)
+
         table.tag_configure('data', background="#EDD1AF")
+        table.heading('VacancyName', text='Связанная вакансия')
         table.heading('CompanyName', text='Название компании')
-        table.heading('CompanyDescription', text='Описание компании'),
+        table.heading('CompanyDescription', text='Описание компании')
         table.heading('AddressCity', text='Город')
-        table.heading('AddressStreet', text='Улица'),
+        table.heading('AddressStreet', text='Улица')
         table.heading('AddressHouse', text='Дом')
-        table.column('#1', width=100)
-        table.column('#2', width=200)
-        table.column('#3', width=70)
-        table.column('#4', width=50)
+
+        table.column('#1', width=120)
+        table.column('#2', width=100)
+        table.column('#3', width=200)
+        table.column('#4', width=70)
         table.column('#5', width=50)
+        table.column('#6', width=50)
+
         for record in allRecords:
             length += 1
             ySize += 50
+
+            vacancyRecord = database['DB']['VacancyDocument'].find_one({'_id': record['VacancyDocument_id']})
+            vacancyName = vacancyRecord['Title']
             companyName = record['CompanyName']
             companyDescription = record['CompanyDescription']
             addressCity = record['AddressCity']
             addressStreet = record['AddressStreet']
             addressHouse = record['AddressHouse']
-            parsedRecord = (companyName, companyDescription, addressCity, addressStreet, addressHouse)
+
+            parsedRecord = (vacancyName, companyName, companyDescription, addressCity, addressStreet, addressHouse)
             table.insert('', END, values=parsedRecord, tags=('data',))
         table['height'] = length
     
     if collectionName == 'CandidateDocument':
         length = 0
-        columns = ('Name', 'Gender', 'DateOfBirth', 'Stage', 'PhoneNumber')
+        columns = ('VacancyName', 'Name', 'Gender', 'DateOfBirth', 'Stage', 'PhoneNumber')
         table = ttk.Treeview(columns=columns, show='headings')
         table.pack()
+
         style = ttk.Style()
         style.configure("Treeview", rowheight=50)
+
         table.tag_configure('data', background="#EDD1AF")
+        table.heading('VacancyName', text='Связанная вакансия')
         table.heading('Name', text='ФИО кандидата')
         table.heading('Gender', text='Пол')
         table.heading('DateOfBirth', text='Дата рождения')
         table.heading('Stage', text='Опыт работы')
         table.heading('PhoneNumber', text='Номер телефона')
-        table.column('#1', width=130)
-        table.column('#2', width=80)
-        table.column('#3', width=120)
-        table.column('#4', width=80)
-        table.column('#5', width=150)
+
+        table.column('#1', width=120)
+        table.column('#2', width=130)
+        table.column('#3', width=80)
+        table.column('#4', width=120)
+        table.column('#5', width=80)
+        table.column('#6', width=150)
+
         for record in allRecords:
             length += 1
             ySize += 50
+
+            vacancyRecord = database['DB']['VacancyDocument'].find_one({'_id': record['VacancyDocument_id']})
+            vacancyName = vacancyRecord['Title']
             name = record['Name']
             gender = record['Gender']
             dateOfBirth = record['DateOfBirth']
             stage = record['Stage']
             phoneNumber = record['PhoneNumber']
-            parsedRecord = (name, gender, dateOfBirth, stage, phoneNumber)
+
+            parsedRecord = (vacancyName, name, gender, dateOfBirth, stage, phoneNumber)
             table.insert('', END, values=parsedRecord, tags=('data',))
         table['height'] = length
 
@@ -191,7 +254,7 @@ def readWindow(collectionName):
     buttonBack.config(font='Arial 12 bold', bg='#FFCA8A')
 
     root.title('Просмотр данных')
-    root.geometry(f'600x{ySize}+550+250')
+    root.geometry(f'700x{ySize}+550+250')
     root.resizable(True, False)
     root['bg'] = '#FFE4C4'
     root.mainloop()
@@ -239,7 +302,6 @@ def funcWindow(collectionName):
         root.destroy()
         mainUI()
 
-
     root = Tk()
     currentCollection = Label(root, text=f'Выбранная коллекция : {collectionName}', font='Arial 12 bold', bg='#FFE4C4')
     currentCollection.pack()
@@ -272,8 +334,6 @@ def funcWindow(collectionName):
 
 #Главное окно для выбора коллекции для подключения
 def mainUI():
-
-    #Кнопка подключения
     def buttonClicked():
         collectionName = comboBoxCollections.get()
         root.destroy()
@@ -308,9 +368,6 @@ def mainUI():
 
 
 def main():
-    global database, collections
-    database = MongoClient()
-    collections = database['DB'].list_collection_names()
     mainUI()
 
 
