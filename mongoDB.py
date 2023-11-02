@@ -3,13 +3,14 @@ from tkinter import ttk
 from pymongo import MongoClient
 from tkinter.messagebox import showerror, showinfo
 
+#Изменение размера окна в зависимости от количества коллекций
 def windowSize(collections):
     resizeY = 75
     for i in range(0, len(collections)):
         resizeY += 50
     return resizeY
 
-
+#Получение списка доступных коллекций
 def availableCollections(collections):
     listAvailableCollections = ''
     for i in range(0, len(collections)):
@@ -18,7 +19,7 @@ def availableCollections(collections):
             listAvailableCollections += '\n\n'
     return listAvailableCollections
 
-
+#Функция добавления вакансий (главная коллекция)
 def addingVacancyCollection(collectionName, companyNameEntry, vacancyDescriptionEntry, salaryEntry, statusEntry):
     if collectionName == 'VacancyDocument':
         companyNameAdd = companyNameEntry.get()
@@ -32,7 +33,7 @@ def addingVacancyCollection(collectionName, companyNameEntry, vacancyDescription
             dictAdd = {'Title': companyNameAdd, 'VacancyDescription': vacancyDescriptionAdd, 'Salary': salaryAdd, 'Status': statusAdd}
             database['DB'][f'{collectionName}'].insert_one(dictAdd)
 
-
+#Окно добавления записей
 def createWindow(collectionName):
     root = Tk()
 
@@ -85,7 +86,7 @@ def createWindow(collectionName):
     root['bg'] = '#FFE4C4'
     root.mainloop()
 
-
+#Окно просмотра записей
 def readWindow(collectionName):
     root = Tk()
 
@@ -195,7 +196,7 @@ def readWindow(collectionName):
     root['bg'] = '#FFE4C4'
     root.mainloop()
 
-
+#Окно обновления записи
 def updateWindow(collectionName):
     root = Tk()
     root.title('Обновление данных')
@@ -204,7 +205,7 @@ def updateWindow(collectionName):
     root['bg'] = '#FFE4C4'
     root.mainloop()
 
-
+#Окно удаления записи
 def buttonDeleteClicked(collectionName):
     root = Tk()
     root.title('Обновление данных')
@@ -212,7 +213,6 @@ def buttonDeleteClicked(collectionName):
     root.resizable(False, False)
     root['bg'] = '#FFE4C4'
     root.mainloop()
-
 
 
 #Выбор функции для взаимодействия
@@ -270,11 +270,6 @@ def funcWindow(collectionName):
     root['bg'] = '#FFE4C4'
     root.mainloop()
 
-#Подключение к окну выбора функции
-def connectionFuncWindow(collectionName):
-    funcWindow(collectionName)
-
-
 #Главное окно для выбора коллекции для подключения
 def mainUI():
 
@@ -282,7 +277,7 @@ def mainUI():
     def buttonClicked():
         collectionName = comboBoxCollections.get()
         root.destroy()
-        connectionFuncWindow(collectionName)
+        funcWindow(collectionName)
 
     sizeY = windowSize(collections)
     root = Tk()
