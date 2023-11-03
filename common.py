@@ -92,3 +92,18 @@ def updateEmployerCollection(oldCompanyName, currentTitle, companyNameEntry, com
         newValues = {'$set' : {'VacancyDocument_id': record['_id'], 'CompanyName': companyNameUpdate, 'CompanyDescription': companyDescriptionUpdate, 'AddressCity': addressCityUpdate, 'AddressStreet': addressStreetUpdate, 'AddressHouse': addressHouseUpdate}}
         database['DB']['EmployerDocument'].update_one(oldValues, newValues)
         showinfo(title='Инфо', message='Данные успешно обновлены')
+
+#Функция изменения кандидата (зависимая коллекция)
+def updateCandidateCollection(oldName, currentTitle, candidateNameEntry, currentGender, dateOfBirthEntry, stageEntry, phoneNumberEntry):
+    candidateNameUpdate = candidateNameEntry.get()
+    dateOfBirthUpdate = dateOfBirthEntry.get()
+    stageUpdate = stageEntry.get()
+    phoneNumberUpdate = phoneNumberEntry.get()
+    if(candidateNameUpdate == '' or dateOfBirthUpdate == '' or stageUpdate == ''):
+        showerror(title='Ошибка', message='Заполните все данные')
+    else:
+        record = database['DB']['VacancyDocument'].find_one({'Title': currentTitle})
+        oldValues = {'Name': oldName}
+        newValues = {'$set': {'VacancyDocument_id': record['_id'], 'Name': candidateNameUpdate, 'Gender': currentGender, 'DateOfBirth': dateOfBirthUpdate, 'Stage': stageUpdate, 'PhoneNumber': phoneNumberUpdate}}
+        database['DB']['CandidateDocument'].update_one(oldValues, newValues)
+        showinfo(title='Инфо', message='Данные успешно обновлены')
