@@ -275,7 +275,6 @@ def readWindow(collectionName):
     root['bg'] = '#FFE4C4'
     root.mainloop()
 
-
 #Окно изменения записей 'VacancyDocument'
 def updateVacancyDocument(oldValues, collectionName):
     root = Tk()
@@ -334,13 +333,96 @@ def updateVacancyDocument(oldValues, collectionName):
     buttonBack.pack(pady=5)
     buttonBack.config(font='Arial 12 bold', bg='#FFCA8A')
 
-    root.title('Просмотр данных')
+    root.title('Изменение данных')
     root.geometry(f'450x{ySize}+550+250')
     root.resizable(True, False)
     root['bg'] = '#FFE4C4'
     root.mainloop()
 
-#Окно обновления записи
+#Окно изменения записей 'EmployerDocument'
+def updateEmployerDocument(oldValues, collectionName):
+    root = Tk()
+
+    def buttonBackClicked():
+        root.destroy()
+        updateWindow(collectionName)
+    
+    def buttonUpdateClicked():
+        currentTitle = comboBoxTitles.get()
+        updateEmployerCollection(oldValues['CompanyName'], currentTitle, companyNameEntry, companyDescriptionEntry, addressCityEntry, addressStreetEntry, addressHouseEntry)
+        root.destroy()
+        updateWindow(collectionName)
+
+    currentCollection = Label(root, text=f'Выбранная коллекция : {collectionName}', font='Arial 12 bold', bg='#FFE4C4')
+    currentCollection.pack(pady=5)
+
+    changeText = Label(root, text=f'Измените данные', font='Arial 12 bold', bg='#FFE4C4')
+    changeText.pack(pady=5)
+
+    formFrame = Frame(root, bg='#FFE4C4')
+    formFrame.pack(expand=True)
+    ySize = 400
+
+    vacancyName = Label(formFrame, text='Название вакансии :', font='Arial 12 bold', bg='#FFE4C4')
+    vacancyName.grid(row=0, column=0, sticky='w')
+    titlesVar = StringVar(value=oldValues['Title'])
+    records = database['DB']['VacancyDocument'].find()
+    titles = []
+    for record in records:
+        titles.append(record['Title'])
+    comboBoxTitles = ttk.Combobox(formFrame, font='Arial 12', textvariable=titlesVar, values=titles, state='readonly')
+    comboBoxTitles.grid(row=0, column=1, sticky='w')
+
+    companyName = Label(formFrame, text='Название компании : ', font='Arial 12 bold', bg='#FFE4C4')
+    companyName.grid(row=1, column=0, sticky='w')
+    companyNameVariable = StringVar()
+    companyNameEntry = Entry(formFrame, textvariable=companyNameVariable, font='Arial 12')
+    companyNameEntry.grid(row=1, column=1, sticky='w', pady=5)
+    companyNameVariable.set(oldValues['CompanyName'])
+
+    companyDescription = Label(formFrame, text='Описание компании : ', font='Arial 12 bold', bg='#FFE4C4')
+    companyDescription.grid(row=2, column=0, sticky='w')
+    companyDescriptionEntry = Text(formFrame, font='Arial 12', width=20, height=3)
+    companyDescriptionEntry.grid(row=2, column=1, sticky='w', pady=5)
+    companyDescriptionEntry.insert("1.0", oldValues['CompanyDescription'])
+
+    addressCity = Label(formFrame, text='Город : ', font='Arial 12 bold', bg='#FFE4C4')
+    addressCity.grid(row=3, column=0, sticky='w')
+    addressCityEntryVariable = StringVar()
+    addressCityEntry = Entry(formFrame, textvariable=addressCityEntryVariable, font='Arial 12')
+    addressCityEntry.grid(row=3, column=1, sticky='w', pady=5)
+    addressCityEntryVariable.set(oldValues['AddressCity'])
+
+    addressStreet = Label(formFrame, text='Улица : ', font='Arial 12 bold', bg='#FFE4C4')
+    addressStreet.grid(row=4, column=0, sticky='w')
+    addressStreetVariable = StringVar()
+    addressStreetEntry = Entry(formFrame, textvariable=addressStreetVariable, font='Arial 12')
+    addressStreetEntry.grid(row=4, column=1, sticky='w', pady=5)
+    addressStreetVariable.set(oldValues['AddressStreet'])
+
+    addressHouse = Label(formFrame, text='Дом : ', font='Arial 12 bold', bg='#FFE4C4')
+    addressHouse.grid(row=5, column=0, sticky='w')
+    addressHouseVariable = StringVar()
+    addressHouseEntry = Entry(formFrame, textvariable=addressHouseVariable, font='Arial 12')
+    addressHouseEntry.grid(row=5, column=1, sticky='w', pady=5)
+    addressHouseVariable.set(oldValues['AddressHouse'])
+
+    buttonUpdate = Button(root, text='Изменить', command=buttonUpdateClicked)
+    buttonUpdate.pack(pady=5)
+    buttonUpdate.config(font='Arial 12 bold', bg='#FFCA8A')
+
+    buttonBack = Button(root, text='Вернуться назад', command=buttonBackClicked)
+    buttonBack.pack(pady=5)
+    buttonBack.config(font='Arial 12 bold', bg='#FFCA8A')
+
+    root.title('Изменение данных')
+    root.geometry(f'450x{ySize}+550+250')
+    root.resizable(True, False)
+    root['bg'] = '#FFE4C4'
+    root.mainloop()
+
+
+#Окно изменения записи
 def updateWindow(collectionName):
     root = Tk()
 
@@ -352,6 +434,8 @@ def updateWindow(collectionName):
         root.destroy()
         if collectionName == 'VacancyDocument':
             updateVacancyDocument(oldValues, collectionName)
+        if collectionName == 'EmployerDocument':
+            updateEmployerDocument(oldValues, collectionName)
 
 
     currentCollection = Label(root, text=f'Выбранная коллекция : {collectionName}', font='Arial 12 bold', bg='#FFE4C4')
@@ -405,6 +489,56 @@ def updateWindow(collectionName):
                 updateData(oldValues, collectionName)
         table.bind("<<TreeviewSelect>>", itemSelected)
 
+    if collectionName == 'EmployerDocument':
+        length = 0
+        columns = ('VacancyName', 'CompanyName', 'CompanyDescription', 'AddressCity', 'AddressStreet', 'AddressHouse')
+        table = ttk.Treeview(columns=columns, show='headings')
+        table.pack()
+
+        style = ttk.Style()
+        style.configure("Treeview", rowheight=50)
+
+        table.tag_configure('data', background="#EDD1AF")
+        table.heading('VacancyName', text='Связанная вакансия')
+        table.heading('CompanyName', text='Название компании')
+        table.heading('CompanyDescription', text='Описание компании')
+        table.heading('AddressCity', text='Город')
+        table.heading('AddressStreet', text='Улица')
+        table.heading('AddressHouse', text='Дом')
+
+        table.column('#1', width=120)
+        table.column('#2', width=100)
+        table.column('#3', width=200)
+        table.column('#4', width=70)
+        table.column('#5', width=50)
+        table.column('#6', width=50)
+
+        for record in allRecords:
+            length += 1
+            ySize += 50
+
+            vacancyRecord = database['DB']['VacancyDocument'].find_one({'_id': record['VacancyDocument_id']})
+            vacancyName = vacancyRecord['Title']
+            companyName = record['CompanyName']
+            companyDescription = record['CompanyDescription']
+            addressCity = record['AddressCity']
+            addressStreet = record['AddressStreet']
+            addressHouse = record['AddressHouse']
+
+            parsedRecord = (vacancyName, companyName, companyDescription, addressCity, addressStreet, addressHouse)
+            table.insert('', END, values=parsedRecord, tags=('data',))
+        table['height'] = length
+
+        def itemSelected(event):
+            selectedStrings = ''
+            for selected in table.selection():
+                item = table.item(selected)
+                string = item['values']
+                oldValues = {'Title': string[0], 'CompanyName': string[1], 'CompanyDescription': string[2], 'AddressCity': string[3], 'AddressStreet': string[4], 'AddressHouse': string[5]}
+                updateData(oldValues, collectionName)
+                #print(string)
+        table.bind("<<TreeviewSelect>>", itemSelected)
+
     buttonBack = Button(root, text='Вернуться назад', command=buttonBackClicked)
     buttonBack.pack(pady=5)
     buttonBack.config(font='Arial 12 bold', bg='#FFCA8A')
@@ -423,7 +557,6 @@ def buttonDeleteClicked(collectionName):
     root.resizable(False, False)
     root['bg'] = '#FFE4C4'
     root.mainloop()
-
 
 #Выбор функции для взаимодействия
 def funcWindow(collectionName):

@@ -72,7 +72,23 @@ def updateVacancyCollection(oldTitle, vacancyNameEntry, vacancyDescriptionEntry,
     if(vacancyNameUpdate == '' or vacancyDescriptionUpdate == '' or salaryUpdate == ''):
         showerror(title='Ошибка', message='Заполните все данные')
     else:
-        oldValues = {'Title': f'{oldTitle}'}
+        oldValues = {'Title': oldTitle}
         newValues = {'$set' : {'Title': vacancyNameUpdate, 'VacancyDescription': vacancyDescriptionUpdate, 'Salary': salaryUpdate, 'Status': currentStatus}}
         database['DB']['VacancyDocument'].update_one(oldValues, newValues)
+        showinfo(title='Инфо', message='Данные успешно обновлены')
+
+#Функция изменения компании (зависимая коллекция)
+def updateEmployerCollection(oldCompanyName, currentTitle, companyNameEntry, companyDescriptionEntry, addressCityEntry, addressStreetEntry, addressHouseEntry):
+    companyNameUpdate = companyNameEntry.get()
+    companyDescriptionUpdate = companyDescriptionEntry.get("1.0", "end-1c")
+    addressCityUpdate = addressCityEntry.get()
+    addressStreetUpdate = addressStreetEntry.get()
+    addressHouseUpdate = addressHouseEntry.get()
+    if(companyNameUpdate == '' or companyDescriptionUpdate == '' or addressCityUpdate == '' or addressStreetUpdate == '' or addressHouseUpdate == ''):
+        showerror(title='Ошибка', message='Заполните все данные')
+    else:
+        record = database['DB']['VacancyDocument'].find_one({'Title': currentTitle})
+        oldValues = {'CompanyName': oldCompanyName}
+        newValues = {'$set' : {'VacancyDocument_id': record['_id'], 'CompanyName': companyNameUpdate, 'CompanyDescription': companyDescriptionUpdate, 'AddressCity': addressCityUpdate, 'AddressStreet': addressStreetUpdate, 'AddressHouse': addressHouseUpdate}}
+        database['DB']['EmployerDocument'].update_one(oldValues, newValues)
         showinfo(title='Инфо', message='Данные успешно обновлены')
