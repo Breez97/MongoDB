@@ -10,7 +10,8 @@ def createWindow(collectionName):
     
     def buttonAddClicked():
         if collectionName == 'VacancyDocument':
-            addingVacancyCollection(vacancyNameEntry, vacancyDescriptionEntry, salaryEntry, statusEntry)
+            currentStatus = comboBoxStatuses.get()
+            addingVacancyCollection(vacancyNameEntry, vacancyDescriptionEntry, salaryEntry, currentStatus)
         if collectionName == 'EmployerDocument':
             currentTitle = comboBoxTitles.get()
             addingEmployerCollection(currentTitle, companyNameEntry, companyDescriptionEntry, addressCityEntry, addressStreetEntry, addressHouseEntry)
@@ -49,8 +50,10 @@ def createWindow(collectionName):
 
         status = Label(formFrame, text='Статус : ', font='Arial 12 bold', bg='#FFE4C4')
         status.grid(row=3, column=0, sticky='w')
-        statusEntry = Entry(formFrame, font='Arial 12')
-        statusEntry.grid(row=3, column=1, sticky='w', pady=5)
+        statuses = ['True', 'False']
+        statusVar = StringVar(value=statuses[0])
+        comboBoxStatuses = ttk.Combobox(formFrame, font='Arial 12', textvariable=statusVar, values=statuses, state='readonly')
+        comboBoxStatuses.grid(row=3, column=1, sticky='w')
     
     if collectionName == 'EmployerDocument':
         ySize = 400
@@ -152,7 +155,7 @@ def readWindow(collectionName):
     if collectionName == 'VacancyDocument':
         length = 0
         columns = ('Title', 'VacancyDescription', 'Salary', 'Status')
-        table = ttk.Treeview(columns=columns, show='headings')
+        table = ttk.Treeview(columns=columns, show='headings', selectmode='none')
         table.pack()
 
         style = ttk.Style()
@@ -185,7 +188,7 @@ def readWindow(collectionName):
     if collectionName == 'EmployerDocument':
         length = 0
         columns = ('VacancyName', 'CompanyName', 'CompanyDescription', 'AddressCity', 'AddressStreet', 'AddressHouse')
-        table = ttk.Treeview(columns=columns, show='headings')
+        table = ttk.Treeview(columns=columns, show='headings', selectmode='none')
         table.pack()
 
         style = ttk.Style()
@@ -225,7 +228,7 @@ def readWindow(collectionName):
     if collectionName == 'CandidateDocument':
         length = 0
         columns = ('VacancyName', 'Name', 'Gender', 'DateOfBirth', 'Stage', 'PhoneNumber')
-        table = ttk.Treeview(columns=columns, show='headings')
+        table = ttk.Treeview(columns=columns, show='headings', selectmode='none')
         table.pack()
 
         style = ttk.Style()
@@ -272,11 +275,142 @@ def readWindow(collectionName):
     root['bg'] = '#FFE4C4'
     root.mainloop()
 
+
+#Окно изменения записей 'VacancyDocument'
+def updateVacancyDocument(oldValues, collectionName):
+    root = Tk()
+    def buttonBackClicked():
+        root.destroy()
+        updateWindow(collectionName)
+    
+    def buttonUpdateClicked():
+        currentStatus = comboBoxStatuses.get()
+        updateVacancyCollection(oldValues['Title'], vacancyNameEntry, vacancyDescriptionEntry, salaryEntry, currentStatus)
+        root.destroy()
+        updateWindow(collectionName)
+
+    currentCollection = Label(root, text=f'Выбранная коллекция : {collectionName}', font='Arial 12 bold', bg='#FFE4C4')
+    currentCollection.pack(pady=5)
+
+    changeText = Label(root, text=f'Измените данные', font='Arial 12 bold', bg='#FFE4C4')
+    changeText.pack(pady=5)
+
+    formFrame = Frame(root, bg='#FFE4C4')
+    formFrame.pack(expand=True)
+
+    ySize = 330
+    vacancyName = Label(formFrame, text='Название вакансии : ', font='Arial 12 bold', bg='#FFE4C4')
+    vacancyName.grid(row=0, column=0, sticky='w')
+    vacancyNameVariable = StringVar()
+    vacancyNameEntry = Entry(formFrame, textvariable=vacancyNameVariable, font='Arial 12')
+    vacancyNameEntry.grid(row=0, column=1, sticky='w', pady=5)
+    vacancyNameVariable.set(oldValues['Title'])
+
+    vacancyDescription = Label(formFrame, text='Описание вакансии : ', font='Arial 12 bold', bg='#FFE4C4')
+    vacancyDescription.grid(row=1, column=0, sticky='w')
+    vacancyDescriptionEntry = Text(formFrame, font='Arial 12', width=20, height=3)
+    vacancyDescriptionEntry.grid(row=1, column=1, sticky='w', pady=5)
+    vacancyDescriptionEntry.insert("1.0", oldValues['VacancyDescription'])
+
+    salary = Label(formFrame, text='Размер зарплаты : ', font='Arial 12 bold', bg='#FFE4C4')
+    salary.grid(row=2, column=0, sticky='w')
+    salaryEntryVariable = StringVar()
+    salaryEntry = Entry(formFrame, textvariable=salaryEntryVariable, font='Arial 12')
+    salaryEntry.grid(row=2, column=1, sticky='w', pady=5)
+    salaryEntryVariable.set(oldValues['Salary'])
+
+    status = Label(formFrame, text='Статус : ', font='Arial 12 bold', bg='#FFE4C4')
+    status.grid(row=3, column=0, sticky='w')
+    statuses = ['True', 'False']
+    statusVar = StringVar(value=oldValues['Status'])
+    comboBoxStatuses = ttk.Combobox(formFrame, font='Arial 12', textvariable=statusVar, values=statuses, state='readonly')
+    comboBoxStatuses.grid(row=3, column=1, sticky='w')
+
+    buttonUpdate = Button(root, text='Изменить', command=buttonUpdateClicked)
+    buttonUpdate.pack(pady=5)
+    buttonUpdate.config(font='Arial 12 bold', bg='#FFCA8A')
+
+    buttonBack = Button(root, text='Вернуться назад', command=buttonBackClicked)
+    buttonBack.pack(pady=5)
+    buttonBack.config(font='Arial 12 bold', bg='#FFCA8A')
+
+    root.title('Просмотр данных')
+    root.geometry(f'450x{ySize}+550+250')
+    root.resizable(True, False)
+    root['bg'] = '#FFE4C4'
+    root.mainloop()
+
 #Окно обновления записи
 def updateWindow(collectionName):
     root = Tk()
+
+    def buttonBackClicked():
+        root.destroy()
+        funcWindow(collectionName)
+    
+    def updateData(oldValues, collectionName):
+        root.destroy()
+        if collectionName == 'VacancyDocument':
+            updateVacancyDocument(oldValues, collectionName)
+
+
+    currentCollection = Label(root, text=f'Выбранная коллекция : {collectionName}', font='Arial 12 bold', bg='#FFE4C4')
+    currentCollection.pack(pady=10)
+
+    changeLabel = Label(root, text='Выберите строку для изменения данных', font='Arial 12 bold', bg='#FFE4C4')
+    changeLabel.pack(pady=10)
+
+    allRecords = database['DB'][f'{collectionName}'].find()
+    ySize = 200
+    
+    if collectionName == 'VacancyDocument':
+        length = 0
+        columns = ('Title', 'VacancyDescription', 'Salary', 'Status')
+        table = ttk.Treeview(columns=columns, show='headings')
+        table.pack()
+
+        style = ttk.Style()
+        style.configure("Treeview", rowheight=50)
+
+        table.tag_configure('data', background="#EDD1AF")
+        table.heading('Title', text='Название')
+        table.heading('VacancyDescription', text='Описание вакансии')
+        table.heading('Salary', text='Зарплата')
+        table.heading('Status', text='Статус')
+
+        table.column('#1', width=100)
+        table.column('#2', width=200)
+        table.column('#3', width=100)
+        table.column('#4', width=100)
+        
+        for record in allRecords:
+            length += 1
+            ySize += 50
+
+            title = record['Title']
+            vacancyDescription = record['VacancyDescription']
+            salary = record['Salary']
+            status = record['Status']
+
+            parsedRecord = (title, vacancyDescription, salary, status)
+            table.insert('', END, values=parsedRecord, tags=('data',))
+        table['height'] = length
+
+        def itemSelected(event):
+            selectedStrings = ''
+            for selected in table.selection():
+                item = table.item(selected)
+                string = item['values']
+                oldValues = {'Title': string[0], 'VacancyDescription': string[1], 'Salary': string[2], 'Status': string[3]}
+                updateData(oldValues, collectionName)
+        table.bind("<<TreeviewSelect>>", itemSelected)
+
+    buttonBack = Button(root, text='Вернуться назад', command=buttonBackClicked)
+    buttonBack.pack(pady=5)
+    buttonBack.config(font='Arial 12 bold', bg='#FFCA8A')
+
     root.title('Обновление данных')
-    root.geometry(f'400x400+550+250')
+    root.geometry(f'700x{ySize}+550+250')
     root.resizable(False, False)
     root['bg'] = '#FFE4C4'
     root.mainloop()
@@ -347,13 +481,16 @@ def funcWindow(collectionName):
 
 #Главное окно для выбора коллекции для подключения
 def mainUI():
+    sizeY = windowSize(collections)
+    root = Tk()
+
     def buttonClicked():
         collectionName = comboBoxCollections.get()
         root.destroy()
         funcWindow(collectionName)
-
-    sizeY = windowSize(collections)
-    root = Tk()
+    
+    def buttonQuitClicked():
+        root.destroy()
 
     textAVailable = Label(text='Available collections:', font='Arial 12 bold', bg='#FFE4C4')
     textAVailable.pack(pady=10)
@@ -372,6 +509,10 @@ def mainUI():
     buttonConnection = Button(root, text='Подключиться', command=buttonClicked)
     buttonConnection.pack(pady=10)
     buttonConnection.config(font='Arial 12 bold', bg='#FFCA8A')
+
+    buttonQuit = Button(root, text='Выйти', command=buttonQuitClicked)
+    buttonQuit.pack(pady=5)
+    buttonQuit.config(font='Arial 12 bold', bg='#FFCA8A')
     
     root.title('Окно взаимодействия с базой данных')
     root.geometry(f'400x{sizeY}+550+250')

@@ -8,7 +8,7 @@ collections = database['DB'].list_collection_names()
 
 #Изменение размера окна в зависимости от количества коллекций
 def windowSize(collections):
-    resizeY = 75
+    resizeY = 110
     for i in range(0, len(collections)):
         resizeY += 50
     return resizeY
@@ -23,15 +23,14 @@ def availableCollections(collections):
     return listAvailableCollections
 
 #Функция добавления вакансий (главная коллекция)
-def addingVacancyCollection(vacancyNameEntry, vacancyDescriptionEntry, salaryEntry, statusEntry):
+def addingVacancyCollection(vacancyNameEntry, vacancyDescriptionEntry, salaryEntry, currentStatus):
     vacancyNameAdd = vacancyNameEntry.get()
     vacancyDescriptionAdd = vacancyDescriptionEntry.get("1.0", "end-1c")
     salaryAdd = salaryEntry.get()
-    statusAdd = statusEntry.get()
-    if(vacancyNameAdd == '' or vacancyDescriptionAdd == '' or salaryAdd == '' or statusAdd == ''):
+    if(vacancyNameAdd == '' or vacancyDescriptionAdd == '' or salaryAdd == ''):
         showerror(title='Ошибка', message='Заполните все данные')
     else:
-        dictAdd = {'Title': vacancyNameAdd, 'VacancyDescription': vacancyDescriptionAdd, 'Salary': salaryAdd, 'Status': statusAdd}
+        dictAdd = {'Title': vacancyNameAdd, 'VacancyDescription': vacancyDescriptionAdd, 'Salary': salaryAdd, 'Status': currentStatus}
         database['DB']['VacancyDocument'].insert_one(dictAdd)
         showinfo(title='Инфо', message='Данные успешно добавлены')
 
@@ -64,4 +63,16 @@ def addingCandidateCollection(currentTitle, candidateNameEntry, currentGender, d
         dictAdd = {'VacancyDocument_id': record['_id'], 'Name': candidateNameAdd, 'Gender': currentGender, 'DateOfBirth': dateOfBirthAdd, 'Stage': stageAdd, 'PhoneNumber': phoneNumberAdd}
         database['DB']['CandidateDocument'].insert_one(dictAdd)
         showinfo(title='Инфо', message='Данные успешно добавлены')
-    
+
+#Функция измения вакансии (главная коллекция)
+def updateVacancyCollection(oldTitle, vacancyNameEntry, vacancyDescriptionEntry, salaryEntry, currentStatus):
+    vacancyNameUpdate = vacancyNameEntry.get()
+    vacancyDescriptionUpdate = vacancyDescriptionEntry.get("1.0", "end-1c")
+    salaryUpdate = salaryEntry.get()
+    if(vacancyNameUpdate == '' or vacancyDescriptionUpdate == '' or salaryUpdate == ''):
+        showerror(title='Ошибка', message='Заполните все данные')
+    else:
+        oldValues = {'Title': f'{oldTitle}'}
+        newValues = {'$set' : {'Title': vacancyNameUpdate, 'VacancyDescription': vacancyDescriptionUpdate, 'Salary': salaryUpdate, 'Status': currentStatus}}
+        database['DB']['VacancyDocument'].update_one(oldValues, newValues)
+        showinfo(title='Инфо', message='Данные успешно обновлены')
