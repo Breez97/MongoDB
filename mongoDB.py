@@ -14,6 +14,10 @@ def createWindow(collectionName):
         if collectionName == 'EmployerDocument':
             currentTitle = comboBoxTitles.get()
             addingEmployerCollection(currentTitle, companyNameEntry, companyDescriptionEntry, addressCityEntry, addressStreetEntry, addressHouseEntry)
+        if collectionName == 'CandidateDocument':
+            currentTitle = comboBoxTitles.get()
+            currentGender = comboBoxGender.get()
+            addingCandidateCollection(currentTitle, candidateNameEntry, currentGender, dateOfBirthEntry, stageEntry, phoneNumberEntry)
 
     currentCollection = Label(root, text=f'Выбранная коллекция : {collectionName}', font='Arial 12 bold', bg='#FFE4C4')
     currentCollection.pack(pady=10)
@@ -96,10 +100,12 @@ def createWindow(collectionName):
         candidateNameEntry = Entry(formFrame, font='Arial 12')
         candidateNameEntry.grid(row=1, column=1, sticky='w')
 
-        gender = Label(formFrame, text='Пол :', font='Arial 12 bold', bg='#FFE4C4')
-        gender.grid(row=2, column=0, sticky='w')
-        genderEntry = Entry(formFrame, font='Arial 12')
-        genderEntry.grid(row=2, column=1, sticky='w')
+        genderLabel = Label(formFrame, text='Пол :', font='Arial 12 bold', bg='#FFE4C4')
+        genderLabel.grid(row=2, column=0, sticky='w')
+        genders = ['Male', 'Female']
+        genderVar = StringVar(value=genders[0])
+        comboBoxGender = ttk.Combobox(formFrame, font='Arial 12', textvariable=genderVar, values=genders, state='readonly')
+        comboBoxGender.grid(row=2, column=1, sticky='w')
 
         dateOfBirth = Label(formFrame, text='Дата рождения :', font='Arial 12 bold', bg='#FFE4C4')
         dateOfBirth.grid(row=3, column=0, sticky='w')
@@ -108,6 +114,13 @@ def createWindow(collectionName):
 
         stage = Label(formFrame, text='Опыт работы :', font='Arial 12 bold', bg='#FFE4C4')
         stage.grid(row=4, column=0, sticky='w')
+        stageEntry = Entry(formFrame, font='Arial 12')
+        stageEntry.grid(row=4, column=1, sticky='w')
+
+        phoneNumber = Label(formFrame, text='Номер телефона : ', font='Arial 12 bold', bg='#FFE4C4')
+        phoneNumber.grid(row=5, column=0, sticky='w')
+        phoneNumberEntry = Entry(formFrame, font='Arial 12')
+        phoneNumberEntry.grid(row=5, column=1, sticky='w')
 
     buttonAdd = Button(root, text='Добавить', command=buttonAddClicked)
     buttonAdd.pack(pady=5)

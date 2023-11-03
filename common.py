@@ -49,3 +49,19 @@ def addingEmployerCollection(currentTitle, companyNameEntry, companyDescriptionE
         dictAdd = {'VacancyDocument_id' : record['_id'], 'CompanyName': companyNameAdd, 'CompanyDescription': companyDescriptionAdd, 'AddressCity': addressCityAdd, 'AddressStreet': addressStreetAdd, 'AddressHouse': addressHouseAdd}
         database['DB']['EmployerDocument'].insert_one(dictAdd)
         showinfo(title='Инфо', message='Данные успешно добавлены')
+
+
+#Функция добавления кандидата (зависимая коллекция)
+def addingCandidateCollection(currentTitle, candidateNameEntry, currentGender, dateOfBirthEntry, stageEntry, phoneNumberEntry):
+    candidateNameAdd = candidateNameEntry.get()
+    dateOfBirthAdd = dateOfBirthEntry.get()
+    stageAdd = stageEntry.get()
+    phoneNumberAdd = phoneNumberEntry.get()
+    if(candidateNameAdd == '' or dateOfBirthAdd == '' or stageAdd == '' or phoneNumberAdd == ''):
+        showerror(title='Ошибка', message='Заполните все данные')
+    else:
+        record = database['DB']['VacancyDocument'].find_one({'Title': currentTitle})
+        dictAdd = {'VacancyDocument_id': record['_id'], 'Name': candidateNameAdd, 'Gender': currentGender, 'DateOfBirth': dateOfBirthAdd, 'Stage': stageAdd, 'PhoneNumber': phoneNumberAdd}
+        database['DB']['CandidateDocument'].insert_one(dictAdd)
+        showinfo(title='Инфо', message='Данные успешно добавлены')
+    
