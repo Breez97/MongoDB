@@ -683,10 +683,78 @@ def updateWindow(collectionName):
     root.mainloop()
 
 #Окно удаления записи
-def buttonDeleteClicked(collectionName):
+def deleteWindow(collectionName):
     root = Tk()
+
+    def buttonBackClicked():
+        root.destroy()
+        funcWindow(collectionName)
+    
+    def deleteDocument():
+        root.destroy()
+        deleteWindow(collectionName)
+    
+    def deleteData(values, collectionName):
+        if collectionName == 'VacancyDocument':
+            deleteVacancyCollection(values['Title'])
+
+    currentCollection = Label(root, text=f'Выбранная коллекция : {collectionName}', font='Arial 12 bold', bg='#FFE4C4')
+    currentCollection.pack(pady=10)
+
+    changeLabel = Label(root, text='Выберите строку для удаления данных', font='Arial 12 bold', bg='#FFE4C4')
+    changeLabel.pack(pady=10)
+
+    allRecords = database['DB'][f'{collectionName}'].find()
+    ySize = 200
+
+    if collectionName == 'VacancyDocument':
+        length = 0
+        columns = ('Title', 'VacancyDescription', 'Salary', 'Status')
+        table = ttk.Treeview(columns=columns, show='headings')
+        table.pack()
+
+        style = ttk.Style()
+        style.configure("Treeview", rowheight=50)
+
+        table.tag_configure('data', background="#EDD1AF")
+        table.heading('Title', text='Название')
+        table.heading('VacancyDescription', text='Описание вакансии')
+        table.heading('Salary', text='Зарплата')
+        table.heading('Status', text='Статус')
+
+        table.column('#1', width=100)
+        table.column('#2', width=200)
+        table.column('#3', width=100)
+        table.column('#4', width=100)
+        
+        for record in allRecords:
+            length += 1
+            ySize += 50
+
+            title = record['Title']
+            vacancyDescription = record['VacancyDescription']
+            salary = record['Salary']
+            status = record['Status']
+
+            parsedRecord = (title, vacancyDescription, salary, status)
+            table.insert('', END, values=parsedRecord, tags=('data',))
+        table['height'] = length
+
+        def itemSelected(event):
+            selectedStrings = ''
+            for selected in table.selection():
+                item = table.item(selected)
+                string = item['values']
+                values = {'Title': string[0], 'VacancyDescription': string[1], 'Salary': string[2], 'Status': string[3]}
+                deleteData(values, collectionName)
+        table.bind("<<TreeviewSelect>>", itemSelected)
+
+    buttonBack = Button(root, text='Вернуться назад', command=buttonBackClicked)
+    buttonBack.pack(pady=5)
+    buttonBack.config(font='Arial 12 bold', bg='#FFCA8A')
+
     root.title('Обновление данных')
-    root.geometry(f'400x400+550+250')
+    root.geometry(f'700x{ySize}+550+250')
     root.resizable(False, False)
     root['bg'] = '#FFE4C4'
     root.mainloop()

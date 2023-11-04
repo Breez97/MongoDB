@@ -107,3 +107,25 @@ def updateCandidateCollection(oldName, currentTitle, candidateNameEntry, current
         newValues = {'$set': {'VacancyDocument_id': record['_id'], 'Name': candidateNameUpdate, 'Gender': currentGender, 'DateOfBirth': dateOfBirthUpdate, 'Stage': stageUpdate, 'PhoneNumber': phoneNumberUpdate}}
         database['DB']['CandidateDocument'].update_one(oldValues, newValues)
         showinfo(title='Инфо', message='Данные успешно обновлены')
+
+#Функция удаления вакансий (главная коллекция)
+def deleteVacancyCollection(title):
+    deleteVacancyValues = {'Title': title}
+
+    currentRecord = database['DB']['VacancyDocument'].find_one({'Title': title})
+    currentRecordId = currentRecord['_id']
+
+    allRecordsEmployerCollection = database['DB']['EmployerDocument'].find()
+    for record in allRecordsEmployerCollection:
+        if record['VacancyDocument_id'] == currentRecordId:
+            deleteEmployerValues = {'VacancyDocument_id': currentRecordId}
+            database['DB']['EmployerDocument'].delete_one(deleteEmployerValues)
+    
+    allRecordsCandidateCollection = database['DB']['CandidateDocument'].find()
+    for record in allRecordsCandidateCollection:
+        if record['VacancyDocument_id'] == currentRecordId:
+            deleteCandidateValues = {'VacancyDocument_id': currentRecordId}
+            database['DB']['CandidateDocument'].delete_one(deleteCandidateValues)
+
+    database['DB']['VacancyDocument'].delete_one(deleteVacancyValues)        
+    showinfo(title='Инфо', message='Данные успешно удалены')
