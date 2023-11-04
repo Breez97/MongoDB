@@ -127,5 +127,17 @@ def deleteVacancyCollection(title):
             deleteCandidateValues = {'VacancyDocument_id': currentRecordId}
             database['DB']['CandidateDocument'].delete_one(deleteCandidateValues)
 
-    database['DB']['VacancyDocument'].delete_one(deleteVacancyValues)        
+    database['DB']['VacancyDocument'].delete_one(deleteVacancyValues)
+    showinfo(title='Инфо', message='Данные успешно удалены')
+
+#Функция удаления компаний (зависимая коллекция)
+def deleteEmployerCollection(companyName):
+    deleteEmployerValues = {'CompanyName': companyName}
+    database['DB']['EmployerDocument'].delete_one(deleteEmployerValues)
+    showinfo(title='Инфо', message='Данные успешно удалены')
+
+#Функция удаления кандидатов (зависимая коллекция)
+def deleteCandidateCollection(name):
+    deleteCandidateValues = {'Name': name}
+    database['DB']['CandidateDocument'].delete_one(deleteCandidateValues)
     showinfo(title='Инфо', message='Данные успешно удалены')

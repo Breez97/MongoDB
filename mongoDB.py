@@ -693,6 +693,10 @@ def deleteWindow(collectionName):
     def deleteData(values, collectionName):
         if collectionName == 'VacancyDocument':
             deleteVacancyCollection(values['Title'])
+        if collectionName == 'EmployerDocument':
+            deleteEmployerCollection(values['CompanyName'])
+        if collectionName == 'CandidateDocument':
+            deleteCandidateCollection(values['Name'])
         root.destroy()
         deleteWindow(collectionName)
 
@@ -746,12 +750,110 @@ def deleteWindow(collectionName):
                 values = {'Title': string[0], 'VacancyDescription': string[1], 'Salary': string[2], 'Status': string[3]}
                 deleteData(values, collectionName)
         table.bind("<<TreeviewSelect>>", itemSelected)
+    
+    if collectionName == 'EmployerDocument':
+        length = 0
+        columns = ('VacancyName', 'CompanyName', 'CompanyDescription', 'AddressCity', 'AddressStreet', 'AddressHouse')
+        table = ttk.Treeview(columns=columns, show='headings')
+        table.pack()
+
+        style = ttk.Style()
+        style.configure("Treeview", rowheight=50)
+
+        table.tag_configure('data', background="#EDD1AF")
+        table.heading('VacancyName', text='Связанная вакансия')
+        table.heading('CompanyName', text='Название компании')
+        table.heading('CompanyDescription', text='Описание компании')
+        table.heading('AddressCity', text='Город')
+        table.heading('AddressStreet', text='Улица')
+        table.heading('AddressHouse', text='Дом')
+
+        table.column('#1', width=120)
+        table.column('#2', width=100)
+        table.column('#3', width=200)
+        table.column('#4', width=70)
+        table.column('#5', width=50)
+        table.column('#6', width=50)
+
+        for record in allRecords:
+            length += 1
+            ySize += 50
+
+            vacancyRecord = database['DB']['VacancyDocument'].find_one({'_id': record['VacancyDocument_id']})
+            vacancyName = vacancyRecord['Title']
+            companyName = record['CompanyName']
+            companyDescription = record['CompanyDescription']
+            addressCity = record['AddressCity']
+            addressStreet = record['AddressStreet']
+            addressHouse = record['AddressHouse']
+
+            parsedRecord = (vacancyName, companyName, companyDescription, addressCity, addressStreet, addressHouse)
+            table.insert('', END, values=parsedRecord, tags=('data',))
+        table['height'] = length
+
+        def itemSelected(event):
+            selectedStrings = ''
+            for selected in table.selection():
+                item = table.item(selected)
+                string = item['values']
+                values = {'Title': string[0], 'CompanyName': string[1], 'CompanyDescription': string[2], 'AddressCity': string[3], 'AddressStreet': string[4], 'AddressHouse': string[5]}
+                deleteData(values, collectionName)
+        table.bind("<<TreeviewSelect>>", itemSelected)
+    
+    if collectionName == 'CandidateDocument':
+        length = 0
+        columns = ('VacancyName', 'Name', 'Gender', 'DateOfBirth', 'Stage', 'PhoneNumber')
+        table = ttk.Treeview(columns=columns, show='headings')
+        table.pack()
+
+        style = ttk.Style()
+        style.configure("Treeview", rowheight=50)
+
+        table.tag_configure('data', background="#EDD1AF")
+        table.heading('VacancyName', text='Связанная вакансия')
+        table.heading('Name', text='ФИО кандидата')
+        table.heading('Gender', text='Пол')
+        table.heading('DateOfBirth', text='Дата рождения')
+        table.heading('Stage', text='Опыт работы')
+        table.heading('PhoneNumber', text='Номер телефона')
+
+        table.column('#1', width=120)
+        table.column('#2', width=130)
+        table.column('#3', width=80)
+        table.column('#4', width=120)
+        table.column('#5', width=80)
+        table.column('#6', width=150)
+
+        for record in allRecords:
+            length += 1
+            ySize += 50
+
+            vacancyRecord = database['DB']['VacancyDocument'].find_one({'_id': record['VacancyDocument_id']})
+            vacancyName = vacancyRecord['Title']
+            name = record['Name']
+            gender = record['Gender']
+            dateOfBirth = record['DateOfBirth']
+            stage = record['Stage']
+            phoneNumber = record['PhoneNumber']
+
+            parsedRecord = (vacancyName, name, gender, dateOfBirth, stage, phoneNumber)
+            table.insert('', END, values=parsedRecord, tags=('data',))
+        table['height'] = length
+
+        def itemSelected(event):
+            selectedStrings = ''
+            for selected in table.selection():
+                item = table.item(selected)
+                string = item['values']
+                values = {'Title': string[0], 'Name': string[1], 'Gender': string[2], 'DateOfBirth': string[3], 'Stage': string[4], 'PhoneNumber': string[5]}
+                deleteData(values, collectionName)
+        table.bind("<<TreeviewSelect>>", itemSelected)
 
     buttonBack = Button(root, text='Вернуться назад', command=buttonBackClicked)
     buttonBack.pack(pady=5)
     buttonBack.config(font='Arial 12 bold', bg='#FFCA8A')
 
-    root.title('Обновление данных')
+    root.title('Удаление данных')
     root.geometry(f'700x{ySize}+550+250')
     root.resizable(False, False)
     root['bg'] = '#FFE4C4'
