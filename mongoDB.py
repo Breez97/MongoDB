@@ -690,13 +690,11 @@ def deleteWindow(collectionName):
         root.destroy()
         funcWindow(collectionName)
     
-    def deleteDocument():
-        root.destroy()
-        deleteWindow(collectionName)
-    
     def deleteData(values, collectionName):
         if collectionName == 'VacancyDocument':
             deleteVacancyCollection(values['Title'])
+        root.destroy()
+        deleteWindow(collectionName)
 
     currentCollection = Label(root, text=f'Выбранная коллекция : {collectionName}', font='Arial 12 bold', bg='#FFE4C4')
     currentCollection.pack(pady=10)
