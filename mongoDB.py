@@ -152,6 +152,7 @@ def readWindow(collectionName):
 
     allRecords = database['DB'][f'{collectionName}'].find()
     ySize = 150
+
     if collectionName == 'VacancyDocument':
         length = 0
         columns = ('Title', 'VacancyDescription', 'Salary', 'Status')
@@ -264,6 +265,54 @@ def readWindow(collectionName):
             parsedRecord = (vacancyName, name, gender, dateOfBirth, stage, phoneNumber)
             table.insert('', END, values=parsedRecord, tags=('data',))
         table['height'] = length
+    
+    if collectionName == 'DenormalizedDocument':
+        def showData(collectionName, title):
+            root.destroy()
+            readWindowData(collectionName, title)
+
+        length = 0
+        vacancyLabel = Label(root, text='Нажмите для просмотра дополнительной информации', font='Arial 12 bold', bg='#FFE4C4')
+        vacancyLabel.pack(pady=5)
+
+        columns = ('Title', 'VacancyDescription', 'Salary', 'Status')
+        table = ttk.Treeview(columns=columns, show='headings')
+        table.pack()
+
+        style = ttk.Style()
+        style.configure("Treeview", rowheight=50)
+
+        table.tag_configure('data', background="#EDD1AF")
+        table.heading('Title', text='Название')
+        table.heading('VacancyDescription', text='Описание вакансии')
+        table.heading('Salary', text='Зарплата')
+        table.heading('Status', text='Статус')
+
+        table.column('#1', width=100)
+        table.column('#2', width=200)
+        table.column('#3', width=100)
+        table.column('#4', width=100)
+        
+        for record in allRecords:
+            length += 1
+            ySize += 50
+
+            title = record['Title']
+            vacancyDescription = record['VacancyDescription']
+            salary = record['Salary']
+            status = record['Status']
+
+            parsedRecord = (title, vacancyDescription, salary, status)
+            table.insert('', END, values=parsedRecord, tags=('data',))
+        table['height'] = length
+
+        def itemSelected(event):
+            selectedStrings = ''
+            for selected in table.selection():
+                item = table.item(selected)
+                string = item['values']
+                showData(collectionName, string[0])
+        table.bind("<<TreeviewSelect>>", itemSelected)
 
     buttonBack = Button(root, text='Вернуться назад', command=buttonBackClicked)
     buttonBack.pack(pady=5)
@@ -274,6 +323,111 @@ def readWindow(collectionName):
     root.resizable(True, False)
     root['bg'] = '#FFE4C4'
     root.mainloop()
+
+
+def readWindowData(collectionName, title):
+    root = Tk()
+
+    ySize = 150
+    lengthEmployers = 0
+
+    def buttonBackClicked():
+        root.destroy()
+        readWindow(collectionName)
+
+    currentCollection = Label(root, text=f'Выбранная коллекция : {collectionName}', font='Arial 12 bold', bg='#FFE4C4')
+    currentCollection.pack(pady=10)
+
+    allRecords = database['DB'][f'{collectionName}'].find({'Title': title})
+
+    length = 0
+    columns = ('CompanyName', 'CompanyDescription', 'AddressCity', 'AddressStreet', 'AddressHouse')
+    tableEmployers = ttk.Treeview(columns=columns, show='headings', selectmode='none')
+    tableEmployers.pack(pady=10)
+
+    style = ttk.Style()
+    style.configure("Treeview", rowheight=50)
+
+    tableEmployers.tag_configure('data', background="#EDD1AF")
+    tableEmployers.heading('CompanyName', text='Название компании')
+    tableEmployers.heading('CompanyDescription', text='Описание компании')
+    tableEmployers.heading('AddressCity', text='Город')
+    tableEmployers.heading('AddressStreet', text='Улица')
+    tableEmployers.heading('AddressHouse', text='Дом')
+
+    tableEmployers.column('#1', width=100)
+    tableEmployers.column('#2', width=200)
+    tableEmployers.column('#3', width=70)
+    tableEmployers.column('#4', width=50)
+    tableEmployers.column('#5', width=50)
+
+    for document in allRecords:
+        recordEmployers = document['Employers']
+        for record in recordEmployers:
+            lengthEmployers += 1
+            ySize += 50
+
+            companyName = record['CompanyName']
+            companyDescription = record['CompanyDescription']
+            addressCity = record['AddressCity']
+            addressStreet = record['AddressStreet']
+            addressHouse = record['AddressHouse']
+
+            parsedRecord = (companyName, companyDescription, addressCity, addressStreet, addressHouse)
+            tableEmployers.insert('', END, values=parsedRecord, tags=('data',))
+    tableEmployers['height'] = lengthEmployers
+
+
+    allRecords = database['DB'][f'{collectionName}'].find({'Title': title})
+    lengthCandidates = 0
+
+    columns = ('Name', 'Gender', 'DateOfBirth', 'Stage', 'PhoneNumber')
+    tableCandidates = ttk.Treeview(columns=columns, show='headings', selectmode='none')
+    tableCandidates.pack()
+
+    style = ttk.Style()
+    style.configure("Treeview", rowheight=50)
+
+    tableCandidates.tag_configure('data', background="#EDD1AF")
+    tableCandidates.heading('Name', text='ФИО кандидата')
+    tableCandidates.heading('Gender', text='Пол')
+    tableCandidates.heading('DateOfBirth', text='Дата рождения')
+    tableCandidates.heading('Stage', text='Опыт работы')
+    tableCandidates.heading('PhoneNumber', text='Номер телефона')
+
+    tableCandidates.column('#1', width=130)
+    tableCandidates.column('#2', width=80)
+    tableCandidates.column('#3', width=120)
+    tableCandidates.column('#4', width=80)
+    tableCandidates.column('#5', width=150)
+
+    for document in allRecords:
+        recordCandidate = document['Candidates']
+        for record in recordCandidate:
+            lengthCandidates += 1
+            ySize += 50
+
+            name = record['Name']
+            gender = record['Gender']
+            dateOfBirth = record['DateOfBirth']
+            stage = record['Stage']
+            phoneNumber = record['PhoneNumber']
+
+            parsedRecord = (name, gender, dateOfBirth, stage, phoneNumber)
+            tableCandidates.insert('', END, values=parsedRecord, tags=('data',))
+
+    tableCandidates['height'] = lengthCandidates
+
+    buttonBack = Button(root, text='Вернуться назад', command=buttonBackClicked)
+    buttonBack.pack(pady=5)
+    buttonBack.config(font='Arial 12 bold', bg='#FFCA8A')
+
+    root.title('Просмотр данных')
+    root.geometry(f'700x{ySize}+550+250')
+    root.resizable(True, False)
+    root['bg'] = '#FFE4C4'
+    root.mainloop()
+
 
 #Окно изменения записей 'VacancyDocument'
 def updateVacancyDocument(oldValues, collectionName):
