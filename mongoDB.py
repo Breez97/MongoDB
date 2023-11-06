@@ -1,5 +1,199 @@
 from common import *
 
+#Добавление денормазилованной вакансии
+def addVacancyDenormalized(collectionName):
+    root = Tk()
+
+    currentCollection = Label(root, text=f'Выбранная коллекция : {collectionName}', font='Arial 12 bold', bg='#FFE4C4')
+    currentCollection.pack(pady=5)
+
+    def buttonAddClicked():
+        currentStatus = comboBoxStatuses.get()
+        addingVacancyDenormalized(vacancyNameEntry, vacancyDescriptionEntry, salaryEntry, currentStatus)
+    
+    def buttonBackClicked():
+        root.destroy()
+        createWindow(collectionName)
+
+    ySize = 310
+
+    formFrame = Frame(root, bg='#FFE4C4')
+    formFrame.pack(expand=True)
+
+    vacancyName = Label(formFrame, text='Название вакансии : ', font='Arial 12 bold', bg='#FFE4C4')
+    vacancyName.grid(row=0, column=0, sticky='w')
+    vacancyNameEntry = Entry(formFrame, font='Arial 12')
+    vacancyNameEntry.grid(row=0, column=1, sticky='w', pady=5)
+
+    vacancyDescription = Label(formFrame, text='Описание вакансии : ', font='Arial 12 bold', bg='#FFE4C4')
+    vacancyDescription.grid(row=1, column=0, sticky='w')
+    vacancyDescriptionEntry = Text(formFrame, font='Arial 12', width=20, height=3)
+    vacancyDescriptionEntry.grid(row=1, column=1, sticky='w', pady=5)
+
+    salary = Label(formFrame, text='Размер зарплаты : ', font='Arial 12 bold', bg='#FFE4C4')
+    salary.grid(row=2, column=0, sticky='w')
+    salaryEntry = Entry(formFrame, font='Arial 12')
+    salaryEntry.grid(row=2, column=1, sticky='w', pady=5)
+
+    status = Label(formFrame, text='Статус : ', font='Arial 12 bold', bg='#FFE4C4')
+    status.grid(row=3, column=0, sticky='w')
+    statuses = ['True', 'False']
+    statusVar = StringVar(value=statuses[0])
+    comboBoxStatuses = ttk.Combobox(formFrame, font='Arial 12', textvariable=statusVar, values=statuses, state='readonly')
+    comboBoxStatuses.grid(row=3, column=1, sticky='w')
+
+    buttonAdd = Button(root, text='Добавить', command=buttonAddClicked)
+    buttonAdd.pack(pady=5)
+    buttonAdd.config(font='Arial 12 bold', bg='#FFCA8A')
+
+    buttonBack = Button(root, text='Вернуться назад', command=buttonBackClicked)
+    buttonBack.pack(pady=5)
+    buttonBack.config(font='Arial 12 bold', bg='#FFCA8A')
+
+    root.title('Добавление новых данных')
+    root.geometry(f'450x{ySize}+550+250')
+    root.resizable(False, False)
+    root['bg'] = '#FFE4C4'
+    root.mainloop()
+
+#Добавление денормализованной компании
+def addEmployerDenormalized(collectionName):
+    root = Tk()
+
+    def buttonBackClicked():
+        root.destroy()
+        createWindow(collectionName)
+    
+    def buttonAddClicked():
+        currentTitle = comboBoxTitles.get()
+        addingEmployerDenormalized(currentTitle, companyNameEntry, companyDescriptionEntry, addressCityEntry, addressStreetEntry, addressHouseEntry)
+    
+    ySize = 400
+
+    formFrame = Frame(root, bg='#FFE4C4')
+    formFrame.pack(expand=True)
+
+    records = database['DB']['DenormalizedDocument'].find()
+    titles = []
+    for record in records:
+        titles.append(record['Title'])
+
+    vacancyName = Label(formFrame, text='Название вакансии :', font='Arial 12 bold', bg='#FFE4C4')
+    vacancyName.grid(row=0, column=0, sticky='w')
+    titlesVar = StringVar(value=titles[0])
+    comboBoxTitles = ttk.Combobox(formFrame, font='Arial 12', textvariable=titlesVar, values=titles, state='readonly')
+    comboBoxTitles.grid(row=0, column=1, sticky='w')
+
+    companyName = Label(formFrame, text='Название компании : ', font='Arial 12 bold', bg='#FFE4C4')
+    companyName.grid(row=1, column=0, sticky='w')
+    companyNameEntry = Entry(formFrame, font='Arial 12')
+    companyNameEntry.grid(row=1, column=1, sticky='w', pady=5)
+
+    companyDescription = Label(formFrame, text='Описание компании : ', font='Arial 12 bold', bg='#FFE4C4')
+    companyDescription.grid(row=2, column=0, sticky='w')
+    companyDescriptionEntry = Text(formFrame, font='Arial 12', width=20, height=3)
+    companyDescriptionEntry.grid(row=2, column=1, sticky='w', pady=5)
+
+    addressCity = Label(formFrame, text='Город : ', font='Arial 12 bold', bg='#FFE4C4')
+    addressCity.grid(row=3, column=0, sticky='w')
+    addressCityEntry = Entry(formFrame, font='Arial 12')
+    addressCityEntry.grid(row=3, column=1, sticky='w', pady=5)
+
+    addressStreet = Label(formFrame, text='Улица : ', font='Arial 12 bold', bg='#FFE4C4')
+    addressStreet.grid(row=4, column=0, sticky='w')
+    addressStreetEntry = Entry(formFrame, font='Arial 12')
+    addressStreetEntry.grid(row=4, column=1, sticky='w', pady=5)
+
+    addressHouse = Label(formFrame, text='Дом : ', font='Arial 12 bold', bg='#FFE4C4')
+    addressHouse.grid(row=5, column=0, sticky='w')
+    addressHouseEntry = Entry(formFrame, font='Arial 12')
+    addressHouseEntry.grid(row=5, column=1, sticky='w', pady=5)
+
+    buttonAdd = Button(root, text='Добавить', command=buttonAddClicked)
+    buttonAdd.pack(pady=5)
+    buttonAdd.config(font='Arial 12 bold', bg='#FFCA8A')
+
+    buttonBack = Button(root, text='Вернуться назад', command=buttonBackClicked)
+    buttonBack.pack(pady=5)
+    buttonBack.config(font='Arial 12 bold', bg='#FFCA8A')
+
+    root.title('Добавление новых данных')
+    root.geometry(f'450x{ySize}+550+250')
+    root.resizable(False, False)
+    root['bg'] = '#FFE4C4'
+    root.mainloop()
+
+#Добавление денормализованного кандидата
+def addCandidateDenormalized(collectionName):
+    root = Tk()
+
+    formFrame = Frame(root, bg='#FFE4C4')
+    formFrame.pack(expand=True)
+
+    records = database['DB']['DenormalizedDocument'].find()
+    titles = []
+    for record in records:
+        titles.append(record['Title'])
+    
+    def buttonBackClicked():
+        root.destroy()
+        createWindow(collectionName)
+    
+    def buttonAddClicked():
+        currentTitle = comboBoxTitles.get()
+        currentGender = comboBoxGender.get()
+        addingCandidateDenormalized(currentTitle, candidateNameEntry, currentGender, dateOfBirthEntry, stageEntry, phoneNumberEntry)
+
+    ySize = 340
+        
+    vacancyName = Label(formFrame, text='Название вакансии :', font='Arial 12 bold', bg='#FFE4C4')
+    vacancyName.grid(row=0, column=0, sticky='w')
+    titlesVar = StringVar(value=titles[0])
+    comboBoxTitles = ttk.Combobox(formFrame, font='Arial 12', textvariable=titlesVar, values=titles, state='readonly')
+    comboBoxTitles.grid(row=0, column=1, sticky='w', pady=5)
+
+    candidateName = Label(formFrame, text='Имя Фамилия :', font='Arial 12 bold', bg='#FFE4C4')
+    candidateName.grid(row=1, column=0, sticky='w')
+    candidateNameEntry = Entry(formFrame, font='Arial 12')
+    candidateNameEntry.grid(row=1, column=1, sticky='w', pady=5)
+
+    genderLabel = Label(formFrame, text='Пол :', font='Arial 12 bold', bg='#FFE4C4')
+    genderLabel.grid(row=2, column=0, sticky='w')
+    genders = ['Male', 'Female']
+    genderVar = StringVar(value=genders[0])
+    comboBoxGender = ttk.Combobox(formFrame, font='Arial 12', textvariable=genderVar, values=genders, state='readonly')
+    comboBoxGender.grid(row=2, column=1, sticky='w', pady=5)
+
+    dateOfBirth = Label(formFrame, text='Дата рождения :', font='Arial 12 bold', bg='#FFE4C4')
+    dateOfBirth.grid(row=3, column=0, sticky='w')
+    dateOfBirthEntry = Entry(formFrame, font='Arial 12')
+    dateOfBirthEntry.grid(row=3, column=1, sticky='w', pady=5)
+
+    stage = Label(formFrame, text='Опыт работы :', font='Arial 12 bold', bg='#FFE4C4')
+    stage.grid(row=4, column=0, sticky='w')
+    stageEntry = Entry(formFrame, font='Arial 12')
+    stageEntry.grid(row=4, column=1, sticky='w', pady=5)
+
+    phoneNumber = Label(formFrame, text='Номер телефона : ', font='Arial 12 bold', bg='#FFE4C4')
+    phoneNumber.grid(row=5, column=0, sticky='w')
+    phoneNumberEntry = Entry(formFrame, font='Arial 12')
+    phoneNumberEntry.grid(row=5, column=1, sticky='w', pady=5)
+
+    
+    buttonAdd = Button(root, text='Добавить', command=buttonAddClicked)
+    buttonAdd.pack(pady=5)
+    buttonAdd.config(font='Arial 12 bold', bg='#FFCA8A')
+
+    buttonBack = Button(root, text='Вернуться назад', command=buttonBackClicked)
+    buttonBack.pack(pady=5)
+    buttonBack.config(font='Arial 12 bold', bg='#FFCA8A')
+
+    root.title('Добавление новых данных')
+    root.geometry(f'450x{ySize}+550+250')
+    root.resizable(False, False)
+    root['bg'] = '#FFE4C4'
+    root.mainloop()
+
 #Окно добавления записей
 def createWindow(collectionName):
     root = Tk()
@@ -21,7 +215,7 @@ def createWindow(collectionName):
             addingCandidateCollection(currentTitle, candidateNameEntry, currentGender, dateOfBirthEntry, stageEntry, phoneNumberEntry)
 
     currentCollection = Label(root, text=f'Выбранная коллекция : {collectionName}', font='Arial 12 bold', bg='#FFE4C4')
-    currentCollection.pack(pady=10)
+    currentCollection.pack(pady=5)
 
     formFrame = Frame(root, bg='#FFE4C4')
     formFrame.pack(expand=True)
@@ -54,7 +248,11 @@ def createWindow(collectionName):
         statusVar = StringVar(value=statuses[0])
         comboBoxStatuses = ttk.Combobox(formFrame, font='Arial 12', textvariable=statusVar, values=statuses, state='readonly')
         comboBoxStatuses.grid(row=3, column=1, sticky='w')
-    
+
+        buttonAdd = Button(root, text='Добавить', command=buttonAddClicked)
+        buttonAdd.pack(pady=5)
+        buttonAdd.config(font='Arial 12 bold', bg='#FFCA8A')
+        
     if collectionName == 'EmployerDocument':
         ySize = 400
 
@@ -88,7 +286,11 @@ def createWindow(collectionName):
         addressHouse.grid(row=5, column=0, sticky='w')
         addressHouseEntry = Entry(formFrame, font='Arial 12')
         addressHouseEntry.grid(row=5, column=1, sticky='w', pady=5)
-    
+
+        buttonAdd = Button(root, text='Добавить', command=buttonAddClicked)
+        buttonAdd.pack(pady=5)
+        buttonAdd.config(font='Arial 12 bold', bg='#FFCA8A')
+        
     if collectionName == 'CandidateDocument':
         ySize = 340
         
@@ -125,9 +327,36 @@ def createWindow(collectionName):
         phoneNumberEntry = Entry(formFrame, font='Arial 12')
         phoneNumberEntry.grid(row=5, column=1, sticky='w', pady=5)
 
-    buttonAdd = Button(root, text='Добавить', command=buttonAddClicked)
-    buttonAdd.pack(pady=5)
-    buttonAdd.config(font='Arial 12 bold', bg='#FFCA8A')
+        buttonAdd = Button(root, text='Добавить', command=buttonAddClicked)
+        buttonAdd.pack(pady=5)
+        buttonAdd.config(font='Arial 12 bold', bg='#FFCA8A')
+    
+    if collectionName == 'DenormalizedDocument':
+
+        def buttonAddVacancyClicked():
+            root.destroy()
+            addVacancyDenormalized(collectionName)
+        
+        def buttonAddEmployerClicked():
+            root.destroy()
+            addEmployerDenormalized(collectionName)
+        
+        def buttonAddCandidateClicked():
+            root.destroy()
+            addCandidateDenormalized(collectionName)
+
+        ySize = 200
+        buttonAddVacancy = Button(root, text='Добавить вакансию', command=buttonAddVacancyClicked)
+        buttonAddVacancy.pack(pady=2)
+        buttonAddVacancy.config(font='Arial 12 bold', bg='#FFCA8A')
+
+        buttonAddEmployer = Button(root, text='Добавить компанию', command=buttonAddEmployerClicked)
+        buttonAddEmployer.pack(pady=2)
+        buttonAddEmployer.config(font='Arial 12 bold', bg='#FFCA8A')
+
+        buttonAddCandidate = Button(root, text='Добавить кандидата', command=buttonAddCandidateClicked)
+        buttonAddCandidate.pack(pady=2)
+        buttonAddCandidate.config(font='Arial 12 bold', bg='#FFCA8A')
 
     buttonBack = Button(root, text='Вернуться назад', command=buttonBackClicked)
     buttonBack.pack(pady=5)
@@ -324,7 +553,7 @@ def readWindow(collectionName):
     root['bg'] = '#FFE4C4'
     root.mainloop()
 
-
+#Просмотр дополниельной информации для денормализованной коллекции
 def readWindowData(collectionName, title):
     root = Tk()
 
@@ -427,7 +656,6 @@ def readWindowData(collectionName, title):
     root.resizable(True, False)
     root['bg'] = '#FFE4C4'
     root.mainloop()
-
 
 #Окно изменения записей 'VacancyDocument'
 def updateVacancyDocument(oldValues, collectionName):

@@ -1,6 +1,6 @@
 from tkinter import *
 from tkinter import ttk
-from pymongo import MongoClient
+from pymongo import MongoClient, UpdateOne
 from tkinter.messagebox import showerror, showinfo
 
 database = MongoClient()
@@ -141,3 +141,58 @@ def deleteCandidateCollection(name):
     deleteCandidateValues = {'Name': name}
     database['DB']['CandidateDocument'].delete_one(deleteCandidateValues)
     showinfo(title='Инфо', message='Данные успешно удалены')
+
+#Функция добавления вакансии (денормализованная коллекиция)
+def addingVacancyDenormalized(vacancyNameEntry, vacancyDescriptionEntry, salaryEntry, currentStatus):
+    vacancyNameAdd = vacancyNameEntry.get()
+    vacancyDescriptionAdd = vacancyDescriptionEntry.get("1.0", "end-1c")
+    salaryAdd = salaryEntry.get()
+    if(vacancyNameAdd == '' or vacancyDescriptionAdd == '' or salaryAdd == ''):
+        showerror(title='Ошибка', message='Заполните все данные')
+    else:
+        dictAdd = {'Title': vacancyNameAdd, 'VacancyDescription': vacancyDescriptionAdd, 'Salary': salaryAdd, 'Status': currentStatus, "Employers": [], "Candidates": []}
+        database['DB']['DenormalizedDocument'].insert_one(dictAdd)
+        showinfo(title='Инфо', message='Данные успешно добавлены')
+
+#Функция добавления компании (денормализованная коллекция)
+def addingEmployerDenormalized(currentTitle, companyNameEntry, companyDescriptionEntry, addressCityEntry, addressStreetEntry, addressHouseEntry):
+    companyNameAdd = companyNameEntry.get()
+    companyDescriptionAdd = companyDescriptionEntry.get("1.0", "end-1c")
+    addressCityAdd = addressCityEntry.get()
+    addressStreetAdd = addressStreetEntry.get()
+    addressHouseAdd = addressHouseEntry.get()
+    if(companyNameAdd == '' or companyDescriptionAdd == '' or addressCityAdd == '' or addressStreetAdd == '' or addressHouseAdd == ''):
+        showerror(title='Ошибка', message='Заполните все данные')
+    else:
+        record = database['DB']['DenormalizedDocument'].find_one({'Title': currentTitle})
+        dictAdd = {'CompanyName': companyNameAdd, 'CompanyDescription': companyDescriptionAdd, 'AddressCity': addressCityAdd, 'AddressStreet': addressStreetAdd, 'AddressHouse': addressHouseAdd}
+        filterCheck = {'Title': currentTitle}
+        updateOperation = {
+            '$push': {
+                'Employers': dictAdd
+            }
+        }        
+        update_one = UpdateOne(filterCheck, updateOperation)
+        database['DB']['DenormalizedDocument'].update_one(filterCheck, updateOperation)
+        showinfo(title='Инфо', message='Данные успешно добавлены')
+
+#Функция добавления кандидата (денормализованная коллекция)
+def addingCandidateDenormalized(currentTitle, candidateNameEntry, currentGender, dateOfBirthEntry, stageEntry, phoneNumberEntry):
+    candidateNameAdd = candidateNameEntry.get()
+    dateOfBirthAdd = dateOfBirthEntry.get()
+    stageAdd = stageEntry.get()
+    phoneNumberAdd = phoneNumberEntry.get()
+    if(candidateNameAdd == '' or dateOfBirthAdd == '' or stageAdd == '' or phoneNumberAdd == ''):
+        showerror(title='Ошибка', message='Заполните все данные')
+    else:
+        record = database['DB']['VacancyDocument'].find_one({'Title': currentTitle})
+        dictAdd = {'Name': candidateNameAdd, 'Gender': currentGender, 'DateOfBirth': dateOfBirthAdd, 'Stage': stageAdd, 'PhoneNumber': phoneNumberAdd}
+        filterCheck = {'Title': currentTitle}
+        updateOperation = {
+            '$push': {
+                'Candidates': dictAdd
+            }
+        }        
+        update_one = UpdateOne(filterCheck, updateOperation)
+        database['DB']['DenormalizedDocument'].update_one(filterCheck, updateOperation)
+        showinfo(title='Инфо', message='Данные успешно добавлены')
