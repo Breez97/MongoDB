@@ -1053,6 +1053,149 @@ def updateWindow(collectionName):
                 oldValues = {'Title': string[0], 'Name': string[1], 'Gender': string[2], 'DateOfBirth': string[3], 'Stage': string[4], 'PhoneNumber': string[5]}
                 updateData(oldValues, collectionName)
         table.bind("<<TreeviewSelect>>", itemSelected)
+    
+    if collectionName == 'DenormalizedDocument':
+        ySize = 320
+
+        def buttonUpdateVacancyClicked():
+            currentVacancy = comboBoxTitles.get()
+            root.destroy()
+            showUpdateVacancyWindow(collectionName, currentVacancy)
+        
+        def buttonUpdateEmployerClicked():
+            currentVacancy = comboBoxTitles.get()
+            root.destroy()
+            showUpdateEmployerWindow(collectionName, currentVacancy)
+        
+        def buttonUpdateCandidateClicked():
+            currentVacancy = comboBoxTitles.get()
+            root.destroy()
+            showWindowCandidateWindow(collectionName, currentVacancy)
+        
+        length = 0
+        columns = ('Title', 'VacancyDescription', 'Salary', 'Status')
+        table = ttk.Treeview(columns=columns, show='headings', selectmode='none')
+        table.pack(pady=5)
+
+        formFrame = Frame(root, bg='#FFE4C4')
+        formFrame.pack(expand=True, pady=5)
+
+        style = ttk.Style()
+        style.configure("Treeview", rowheight=50)
+
+        table.tag_configure('data', background="#EDD1AF")
+        table.heading('Title', text='Название')
+        table.heading('VacancyDescription', text='Описание вакансии')
+        table.heading('Salary', text='Зарплата')
+        table.heading('Status', text='Статус')
+
+        table.column('#1', width=100)
+        table.column('#2', width=200)
+        table.column('#3', width=100)
+        table.column('#4', width=100)
+        
+        for record in allRecords:
+            length += 1
+            ySize += 50
+
+            title = record['Title']
+            vacancyDescription = record['VacancyDescription']
+            salary = record['Salary']
+            status = record['Status']
+
+            parsedRecord = (title, vacancyDescription, salary, status)
+            table.insert('', END, values=parsedRecord, tags=('data',))
+        table['height'] = length
+
+        records = database['DB']['DenormalizedDocument'].find()
+        titles = []
+        for record in records:
+            titles.append(record['Title'])
+
+        vacancyName = Label(formFrame, text='Название вакансии : ', font='Arial 12 bold', bg='#FFE4C4')
+        vacancyName.grid(row=0, column=0, sticky='w')
+        titlesVar = StringVar(value=titles[0])
+        comboBoxTitles = ttk.Combobox(formFrame, font='Arial 12', textvariable=titlesVar, values=titles, state='readonly')
+        comboBoxTitles.grid(row=0, column=1, sticky='w')
+
+        buttonUpdateVacancy = Button(root, text='Обновить вакансию', command=buttonUpdateVacancyClicked)
+        buttonUpdateVacancy.pack(pady=5)
+        buttonUpdateVacancy.config(font='Arial 12 bold', bg='#FFCA8A')
+        buttonUpdateEmployer = Button(root, text='Обновить компанию', command=buttonUpdateEmployerClicked)
+        buttonUpdateEmployer.pack(pady=5)
+        buttonUpdateEmployer.config(font='Arial 12 bold', bg='#FFCA8A')
+        
+        buttonUpdateCandidate = Button(root, text='Обновить кандидата', command=buttonUpdateCandidateClicked)
+        buttonUpdateCandidate.pack(pady=5)
+        buttonUpdateCandidate.config(font='Arial 12 bold', bg='#FFCA8A')
+
+    buttonBack = Button(root, text='Вернуться назад', command=buttonBackClicked)
+    buttonBack.pack(pady=5)
+    buttonBack.config(font='Arial 12 bold', bg='#FFCA8A')
+
+    root.title('Обновление данных')
+    root.geometry(f'700x{ySize}+550+250')
+    root.resizable(False, False)
+    root['bg'] = '#FFE4C4'
+    root.mainloop()
+
+
+def showUpdateVacancyWindow(collectionName, currentVacancy):
+    root = Tk()
+
+    record = database['DB']['DenormalizedDocument'].find_one({'Title': currentVacancy})
+    oldTitle = record['Title']
+
+    def buttonBackClicked():
+        root.destroy()
+        updateWindow(collectionName)
+    
+    def buttonUpdateClicked():
+        currentStatus = comboBoxStatuses.get()
+        updateVacancyCollectionDenormalized(oldTitle, vacancyNameEntry, vacancyDescriptionEntry, salaryEntry, currentStatus)
+        root.destroy()
+        updateWindow(collectionName)
+    
+    currentCollection = Label(root, text=f'Выбранная коллекция : {collectionName}', font='Arial 12 bold', bg='#FFE4C4')
+    currentCollection.pack(pady=5)
+
+    changeText = Label(root, text=f'Измените данные', font='Arial 12 bold', bg='#FFE4C4')
+    changeText.pack(pady=5)
+
+    formFrame = Frame(root, bg='#FFE4C4')
+    formFrame.pack(expand=True)
+
+    ySize = 330
+    vacancyName = Label(formFrame, text='Название вакансии : ', font='Arial 12 bold', bg='#FFE4C4')
+    vacancyName.grid(row=0, column=0, sticky='w')
+    vacancyNameEntryVariable = StringVar()
+    vacancyNameEntry = Entry(formFrame, text=vacancyNameEntryVariable, font='Arial 12')
+    vacancyNameEntry.grid(row=0, column=1, sticky='w')
+    vacancyNameEntryVariable.set(record['Title'])
+
+    vacancyDescription = Label(formFrame, text='Описание вакансии : ', font='Arial 12 bold', bg='#FFE4C4')
+    vacancyDescription.grid(row=1, column=0, sticky='w')
+    vacancyDescriptionEntry = Text(formFrame, font='Arial 12', width=20, height=3)
+    vacancyDescriptionEntry.grid(row=1, column=1, sticky='w', pady=5)
+    vacancyDescriptionEntry.insert("1.0", record['VacancyDescription'])
+
+    salary = Label(formFrame, text='Размер зарплаты : ', font='Arial 12 bold', bg='#FFE4C4')
+    salary.grid(row=2, column=0, sticky='w')
+    salaryEntryVariable = StringVar()
+    salaryEntry = Entry(formFrame, textvariable=salaryEntryVariable, font='Arial 12')
+    salaryEntry.grid(row=2, column=1, sticky='w', pady=5)
+    salaryEntryVariable.set(record['Salary'])
+
+    status = Label(formFrame, text='Статус : ', font='Arial 12 bold', bg='#FFE4C4')
+    status.grid(row=3, column=0, sticky='w')
+    statuses = ['True', 'False']
+    statusVar = StringVar(value=str(record['Status']))
+    comboBoxStatuses = ttk.Combobox(formFrame, font='Arial 12', textvariable=statusVar, values=statuses, state='readonly')
+    comboBoxStatuses.grid(row=3, column=1, sticky='w')
+
+    buttonUpdate = Button(root, text='Изменить', command=buttonUpdateClicked)
+    buttonUpdate.pack(pady=5)
+    buttonUpdate.config(font='Arial 12 bold', bg='#FFCA8A')
 
     buttonBack = Button(root, text='Вернуться назад', command=buttonBackClicked)
     buttonBack.pack(pady=5)

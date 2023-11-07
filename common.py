@@ -196,3 +196,16 @@ def addingCandidateDenormalized(currentTitle, candidateNameEntry, currentGender,
         update_one = UpdateOne(filterCheck, updateOperation)
         database['DB']['DenormalizedDocument'].update_one(filterCheck, updateOperation)
         showinfo(title='Инфо', message='Данные успешно добавлены')
+
+#Функция обновления данных вакансии (денормализованная коллекция)
+def updateVacancyCollectionDenormalized(oldTitle, vacancyNameEntry, vacancyDescriptionEntry, salaryEntry, currentStatus):
+    vacancyNameUpdate = vacancyNameEntry.get()
+    vacancyDescriptionUpdate = vacancyDescriptionEntry.get("1.0", "end-1c")
+    salaryUpdate = salaryEntry.get()
+    if(vacancyNameUpdate == '' or vacancyDescriptionUpdate == '' or salaryUpdate == ''):
+        showerror(title='Ошибка', message='Заполните все данные')
+    else:
+        oldValues = {'Title': oldTitle}
+        newValues = {'$set' : {'Title': vacancyNameUpdate, 'VacancyDescription': vacancyDescriptionUpdate, 'Salary': salaryUpdate, 'Status': currentStatus}}
+        database['DB']['DenormalizedDocument'].update_one(oldValues, newValues)
+        showinfo(title='Инфо', message='Данные успешно обновлены')
