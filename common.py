@@ -172,8 +172,8 @@ def addingEmployerDenormalized(currentTitle, companyNameEntry, companyDescriptio
                 'Employers': dictAdd
             }
         }        
-        update_one = UpdateOne(filterCheck, updateOperation)
-        database['DB']['DenormalizedDocument'].update_one(filterCheck, updateOperation)
+        updateOne = UpdateOne(filterCheck, updateOperation)
+        database['DB']['DenormalizedDocument'].updateOne(filterCheck, updateOperation)
         showinfo(title='Инфо', message='Данные успешно добавлены')
 
 #Функция добавления кандидата (денормализованная коллекция)
@@ -185,7 +185,7 @@ def addingCandidateDenormalized(currentTitle, candidateNameEntry, currentGender,
     if(candidateNameAdd == '' or dateOfBirthAdd == '' or stageAdd == '' or phoneNumberAdd == ''):
         showerror(title='Ошибка', message='Заполните все данные')
     else:
-        record = database['DB']['VacancyDocument'].find_one({'Title': currentTitle})
+        record = database['DB']['DenormalizedDocument'].find_one({'Title': currentTitle})
         dictAdd = {'Name': candidateNameAdd, 'Gender': currentGender, 'DateOfBirth': dateOfBirthAdd, 'Stage': stageAdd, 'PhoneNumber': phoneNumberAdd}
         filterCheck = {'Title': currentTitle}
         updateOperation = {
@@ -193,8 +193,8 @@ def addingCandidateDenormalized(currentTitle, candidateNameEntry, currentGender,
                 'Candidates': dictAdd
             }
         }        
-        update_one = UpdateOne(filterCheck, updateOperation)
-        database['DB']['DenormalizedDocument'].update_one(filterCheck, updateOperation)
+        updateOne = UpdateOne(filterCheck, updateOperation)
+        database['DB']['DenormalizedDocument'].updateOne(filterCheck, updateOperation)
         showinfo(title='Инфо', message='Данные успешно добавлены')
 
 #Функция обновления данных вакансии (денормализованная коллекция)
@@ -208,4 +208,27 @@ def updateVacancyCollectionDenormalized(oldTitle, vacancyNameEntry, vacancyDescr
         oldValues = {'Title': oldTitle}
         newValues = {'$set' : {'Title': vacancyNameUpdate, 'VacancyDescription': vacancyDescriptionUpdate, 'Salary': salaryUpdate, 'Status': currentStatus}}
         database['DB']['DenormalizedDocument'].update_one(oldValues, newValues)
+        showinfo(title='Инфо', message='Данные успешно обновлены')
+
+#Функция обновления данных компании (денормализованная коллекиця)
+def updateEmployerCollectionDenormalized(currentVacancy, oldName, companyNameEntry, companyDescriptionEntry, addressCityEntry, addressStreetEntry, addressHouseEntry):
+    companyNameUpdate = companyNameEntry.get()
+    companyDescriptionUpdate = companyDescriptionEntry.get("1.0", "end-1c")
+    addressCityUpdate = addressCityEntry.get()
+    addressStreetUpdate = addressStreetEntry.get()
+    addressHouseUpdate = addressHouseEntry.get()
+    if(companyNameUpdate == '' or companyDescriptionUpdate == '' or addressCityUpdate == '' or addressStreetUpdate == '' or addressHouseUpdate == ''):
+        showerror(title='Ошибка', message='Заполните все данные')
+    else:
+        database['DB']['DenormalizedDocument'].update_one(
+        {'Title': currentVacancy, 'Employers.CompanyName': oldName},
+        {'$set': {
+            'Employers.$.CompanyName': companyNameUpdate,
+            'Employers.$.CompanyDescription': companyDescriptionUpdate,
+            'Employers.$.AddressCity': addressCityUpdate,
+            'Employers.$.AddressStreet': addressStreetUpdate,
+            'Employers.$.AddressHouse': addressHouseUpdate}
+        }
+        )
+
         showinfo(title='Инфо', message='Данные успешно обновлены')
