@@ -171,9 +171,8 @@ def addingEmployerDenormalized(currentTitle, companyNameEntry, companyDescriptio
             '$push': {
                 'Employers': dictAdd
             }
-        }        
-        updateOne = UpdateOne(filterCheck, updateOperation)
-        database['DB']['DenormalizedDocument'].updateOne(filterCheck, updateOperation)
+        }
+        database['DB']['DenormalizedDocument'].update_one(filterCheck, updateOperation)
         showinfo(title='Инфо', message='Данные успешно добавлены')
 
 #Функция добавления кандидата (денормализованная коллекция)
@@ -192,9 +191,8 @@ def addingCandidateDenormalized(currentTitle, candidateNameEntry, currentGender,
             '$push': {
                 'Candidates': dictAdd
             }
-        }        
-        updateOne = UpdateOne(filterCheck, updateOperation)
-        database['DB']['DenormalizedDocument'].updateOne(filterCheck, updateOperation)
+        }
+        database['DB']['DenormalizedDocument'].update_one(filterCheck, updateOperation)
         showinfo(title='Инфо', message='Данные успешно добавлены')
 
 #Функция обновления данных вакансии (денормализованная коллекция)
@@ -254,3 +252,19 @@ def updateCandidateCollectionDenormalized(currentVacancy, oldName, candidateName
             }
         )
         showinfo(title='Инфо', message='Данные успешно обновлены')
+
+#Функция удаления вакансии (денормализованная коллекция)
+def deleteVacancyCollectionDenormalized(currentVacancy):
+    deleteVacancyValues = {'Title': currentVacancy}
+    database['DB']['DenormalizedDocument'].delete_one(deleteVacancyValues)
+    showinfo(title='Инфо', message='Данные успешно удалены')
+
+#Функция удаления компании (денормализованная коллекция)
+def deleteEmployerCollectionDenormalized(oldValues, currentVacancy):
+    database['DB']['DenormalizedDocument'].update_one({'Title': currentVacancy}, {'$pull': {'Employers' : {'CompanyName': oldValues['CompanyName']}}})
+    showinfo(title='Инфо', message='Данные успешно удалены')
+
+#Функция удаления кандидата (денормализованная коллекция)
+def deleteCandidateCollectionDenormalized(oldValues, currentVacancy):
+    database['DB']['DenormalizedDocument'].update_one({'Title': currentVacancy}, {'$pull': {'Candidates' : {'Name': oldValues['Name']}}})
+    showinfo(title='Инфо', message='Данные успешно удалены')

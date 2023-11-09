@@ -60,6 +60,9 @@ def addVacancyDenormalized(collectionName):
 def addEmployerDenormalized(collectionName):
     root = Tk()
 
+    currentCollection = Label(root, text=f'Выбранная коллекция : {collectionName}', font='Arial 12 bold', bg='#FFE4C4')
+    currentCollection.pack(pady=5)
+
     def buttonBackClicked():
         root.destroy()
         createWindow(collectionName)
@@ -126,6 +129,9 @@ def addEmployerDenormalized(collectionName):
 #Добавление денормализованного кандидата
 def addCandidateDenormalized(collectionName):
     root = Tk()
+
+    currentCollection = Label(root, text=f'Выбранная коллекция : {collectionName}', font='Arial 12 bold', bg='#FFE4C4')
+    currentCollection.pack(pady=5)
 
     formFrame = Frame(root, bg='#FFE4C4')
     formFrame.pack(expand=True)
@@ -1671,12 +1677,249 @@ def deleteWindow(collectionName):
                 values = {'Title': string[0], 'Name': string[1], 'Gender': string[2], 'DateOfBirth': string[3], 'Stage': string[4], 'PhoneNumber': string[5]}
                 deleteData(values, collectionName)
         table.bind("<<TreeviewSelect>>", itemSelected)
+    
+    if collectionName == 'DenormalizedDocument':
+        ySize = 320
 
+        def buttonDeleteVacancyClicked():
+            currentVacancy = comboBoxTitles.get()
+            deleteVacancyCollectionDenormalized(currentVacancy)
+            root.destroy()
+            deleteWindow(collectionName)
+        
+        def buttonDeleteEmployerClicked():
+            currentVacancy = comboBoxTitles.get()
+            root.destroy()
+            showDeleteEmployerWindow(collectionName, currentVacancy)
+        
+        def buttonDeleteCandidateClicked():
+            currentVacancy = comboBoxTitles.get()
+            root.destroy()
+            showDeleteCandidateWindow(collectionName, currentVacancy)
+        
+        length = 0
+        columns = ('Title', 'VacancyDescription', 'Salary', 'Status')
+        table = ttk.Treeview(columns=columns, show='headings', selectmode='none')
+        table.pack(pady=5)
+
+        formFrame = Frame(root, bg='#FFE4C4')
+        formFrame.pack(expand=True, pady=5)
+
+        style = ttk.Style()
+        style.configure("Treeview", rowheight=50)
+
+        table.tag_configure('data', background="#EDD1AF")
+        table.heading('Title', text='Название')
+        table.heading('VacancyDescription', text='Описание вакансии')
+        table.heading('Salary', text='Зарплата')
+        table.heading('Status', text='Статус')
+
+        table.column('#1', width=100)
+        table.column('#2', width=200)
+        table.column('#3', width=100)
+        table.column('#4', width=100)
+        
+        for record in allRecords:
+            length += 1
+            ySize += 50
+
+            title = record['Title']
+            vacancyDescription = record['VacancyDescription']
+            salary = record['Salary']
+            status = record['Status']
+
+            parsedRecord = (title, vacancyDescription, salary, status)
+            table.insert('', END, values=parsedRecord, tags=('data',))
+        table['height'] = length
+
+        records = database['DB']['DenormalizedDocument'].find()
+        titles = []
+        for record in records:
+            titles.append(record['Title'])
+
+        vacancyName = Label(formFrame, text='Название вакансии : ', font='Arial 12 bold', bg='#FFE4C4')
+        vacancyName.grid(row=0, column=0, sticky='w')
+        titlesVar = StringVar(value=titles[0])
+        comboBoxTitles = ttk.Combobox(formFrame, font='Arial 12', textvariable=titlesVar, values=titles, state='readonly')
+        comboBoxTitles.grid(row=0, column=1, sticky='w')
+
+        buttonDeleteVacancy = Button(root, text='Удалить вакансию', command=buttonDeleteVacancyClicked)
+        buttonDeleteVacancy.pack(pady=5)
+        buttonDeleteVacancy.config(font='Arial 12 bold', bg='#FFCA8A')
+
+        buttonDeleteEmployer = Button(root, text='Удалить компанию', command=buttonDeleteEmployerClicked)
+        buttonDeleteEmployer.pack(pady=5)
+        buttonDeleteEmployer.config(font='Arial 12 bold', bg='#FFCA8A')
+        
+        buttonDeleteCandidate = Button(root, text='Удалить кандидата', command=buttonDeleteCandidateClicked)
+        buttonDeleteCandidate.pack(pady=5)
+        buttonDeleteCandidate.config(font='Arial 12 bold', bg='#FFCA8A')
+    
     buttonBack = Button(root, text='Вернуться назад', command=buttonBackClicked)
     buttonBack.pack(pady=5)
     buttonBack.config(font='Arial 12 bold', bg='#FFCA8A')
 
     root.title('Удаление данных')
+    root.geometry(f'700x{ySize}+550+250')
+    root.resizable(False, False)
+    root['bg'] = '#FFE4C4'
+    root.mainloop()
+
+#Окно удаления компании (денормализованная коллекция)
+def showDeleteEmployerWindow(collectionName, currentVacancy):
+    root = Tk()
+
+    ySize = 200
+
+    def buttonBackClicked():
+        root.destroy()
+        deleteWindow(collectionName)
+    
+    def deleteData(oldValues, currentVacancy):
+        deleteEmployerCollectionDenormalized(oldValues, currentVacancy)
+        root.destroy()
+        showDeleteEmployerWindow(collectionName, currentVacancy)
+
+    
+    currentCollection = Label(root, text=f'Выбранная коллекция : {collectionName}', font='Arial 12 bold', bg='#FFE4C4')
+    currentCollection.pack(pady=5)
+
+    changeText = Label(root, text=f'Измените данные', font='Arial 12 bold', bg='#FFE4C4')
+    changeText.pack(pady=5)
+
+    allRecords = database['DB'][f'{collectionName}'].find({'Title': currentVacancy})
+
+    length = 0
+    columns = ('CompanyName', 'CompanyDescription', 'AddressCity', 'AddressStreet', 'AddressHouse')
+    table = ttk.Treeview(columns=columns, show='headings')
+    table.pack(pady=10)
+
+    style = ttk.Style()
+    style.configure("Treeview", rowheight=50)
+
+    table.tag_configure('data', background="#EDD1AF")
+    table.heading('CompanyName', text='Название компании')
+    table.heading('CompanyDescription', text='Описание компании')
+    table.heading('AddressCity', text='Город')
+    table.heading('AddressStreet', text='Улица')
+    table.heading('AddressHouse', text='Дом')
+
+    table.column('#1', width=100)
+    table.column('#2', width=200)
+    table.column('#3', width=70)
+    table.column('#4', width=50)
+    table.column('#5', width=50)
+
+    for document in allRecords:
+        recordEmployers = document['Employers']
+        for record in recordEmployers:
+            length += 1
+            ySize += 50
+
+            companyName = record['CompanyName']
+            companyDescription = record['CompanyDescription']
+            addressCity = record['AddressCity']
+            addressStreet = record['AddressStreet']
+            addressHouse = record['AddressHouse']
+
+            parsedRecord = (companyName, companyDescription, addressCity, addressStreet, addressHouse)
+            table.insert('', END, values=parsedRecord, tags=('data',))
+    table['height'] = length
+
+    def itemSelected(event):
+        selectedStrings = ''
+        for selected in table.selection():
+            item = table.item(selected)
+            string = item['values']
+            oldValues = {'CompanyName': string[0], 'CompanyDescription': string[1], 'AddressCity': string[2], 'AddressStreet': string[3], 'AddressHouse': string[4]}
+            deleteData(oldValues, currentVacancy)
+    table.bind("<<TreeviewSelect>>", itemSelected)
+
+    buttonBack = Button(root, text='Вернуться назад', command=buttonBackClicked)
+    buttonBack.pack(pady=5)
+    buttonBack.config(font='Arial 12 bold', bg='#FFCA8A')
+
+    root.title('Обновление данных')
+    root.geometry(f'700x{ySize}+550+250')
+    root.resizable(False, False)
+    root['bg'] = '#FFE4C4'
+    root.mainloop()
+
+#Окно удаления кандидата (денормализованная коллекция)
+def showDeleteCandidateWindow(collectionName, currentVacancy):
+    root = Tk()
+
+    def buttonBackClicked():
+        root.destroy()
+        updateWindow(collectionName)
+    
+    def deleteData(oldValues, currentVacancy):
+        deleteCandidateCollectionDenormalized(oldValues, currentVacancy)
+        root.destroy()
+        showDeleteCandidateWindow(collectionName, currentVacancy)
+    
+    ySize = 150
+    
+    currentCollection = Label(root, text=f'Выбранная коллекция : {collectionName}', font='Arial 12 bold', bg='#FFE4C4')
+    currentCollection.pack(pady=5)
+
+    changeText = Label(root, text=f'Измените данные', font='Arial 12 bold', bg='#FFE4C4')
+    changeText.pack(pady=5)
+
+    allRecords = database['DB'][f'{collectionName}'].find({'Title': currentVacancy})
+
+    length = 0
+
+    columns = ('Name', 'Gender', 'DateOfBirth', 'Stage', 'PhoneNumber')
+    table = ttk.Treeview(columns=columns, show='headings')
+    table.pack()
+
+    style = ttk.Style()
+    style.configure("Treeview", rowheight=50)
+
+    table.tag_configure('data', background="#EDD1AF")
+    table.heading('Name', text='ФИО кандидата')
+    table.heading('Gender', text='Пол')
+    table.heading('DateOfBirth', text='Дата рождения')
+    table.heading('Stage', text='Опыт работы')
+    table.heading('PhoneNumber', text='Номер телефона')
+
+    table.column('#1', width=130)
+    table.column('#2', width=80)
+    table.column('#3', width=120)
+    table.column('#4', width=80)
+    table.column('#5', width=150)
+
+    for document in allRecords:
+        recordCandidate = document['Candidates']
+        for record in recordCandidate:
+            length += 1
+            ySize += 50
+
+            name = record['Name']
+            gender = record['Gender']
+            dateOfBirth = record['DateOfBirth']
+            stage = record['Stage']
+            phoneNumber = record['PhoneNumber']
+
+            parsedRecord = (name, gender, dateOfBirth, stage, phoneNumber)
+            table.insert('', END, values=parsedRecord, tags=('data',))
+    table['height'] = length
+
+    def itemSelected(event):
+        selectedStrings = ''
+        for selected in table.selection():
+            item = table.item(selected)
+            string = item['values']
+            oldValues = {'Name': string[0], 'Gender': string[1], 'DateOfBirth': string[2], 'Stage': string[3], 'PhoneNumber': string[4]}
+            deleteData(oldValues, currentVacancy)
+    table.bind("<<TreeviewSelect>>", itemSelected)
+
+    buttonBack = Button(root, text='Вернуться назад', command=buttonBackClicked)
+    buttonBack.pack(pady=5)
+    buttonBack.config(font='Arial 12 bold', bg='#FFCA8A')
+
+    root.title('Обновление данных')
     root.geometry(f'700x{ySize}+550+250')
     root.resizable(False, False)
     root['bg'] = '#FFE4C4'
