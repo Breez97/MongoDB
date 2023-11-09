@@ -644,7 +644,6 @@ def readWindowData(collectionName, title):
 
             parsedRecord = (name, gender, dateOfBirth, stage, phoneNumber)
             tableCandidates.insert('', END, values=parsedRecord, tags=('data',))
-
     tableCandidates['height'] = lengthCandidates
 
     buttonBack = Button(root, text='Вернуться назад', command=buttonBackClicked)
@@ -667,8 +666,6 @@ def updateVacancyDocument(oldValues, collectionName):
     def buttonUpdateClicked():
         currentStatus = comboBoxStatuses.get()
         updateVacancyCollection(oldValues['Title'], vacancyNameEntry, vacancyDescriptionEntry, salaryEntry, currentStatus)
-        root.destroy()
-        updateWindow(collectionName)
 
     currentCollection = Label(root, text=f'Выбранная коллекция : {collectionName}', font='Arial 12 bold', bg='#FFE4C4')
     currentCollection.pack(pady=5)
@@ -732,8 +729,6 @@ def updateEmployerDocument(oldValues, collectionName):
     def buttonUpdateClicked():
         currentTitle = comboBoxTitles.get()
         updateEmployerCollection(oldValues['CompanyName'], currentTitle, companyNameEntry, companyDescriptionEntry, addressCityEntry, addressStreetEntry, addressHouseEntry)
-        root.destroy()
-        updateWindow(collectionName)
 
     currentCollection = Label(root, text=f'Выбранная коллекция : {collectionName}', font='Arial 12 bold', bg='#FFE4C4')
     currentCollection.pack(pady=5)
@@ -815,8 +810,6 @@ def updateCandidateDocument(oldValues, collectionName):
         currentTitle = comboBoxTitles.get()
         currentGender = comboBoxGender.get()
         updateCandidateCollection(oldValues['Name'], currentTitle, candidateNameEntry, currentGender, dateOfBirthEntry, stageEntry, phoneNumberEntry)
-        root.destroy()
-        updateWindow(collectionName)
 
     currentCollection = Label(root, text=f'Выбранная коллекция : {collectionName}', font='Arial 12 bold', bg='#FFE4C4')
     currentCollection.pack(pady=5)
@@ -1070,7 +1063,7 @@ def updateWindow(collectionName):
         def buttonUpdateCandidateClicked():
             currentVacancy = comboBoxTitles.get()
             root.destroy()
-            showWindowCandidateWindow(collectionName, currentVacancy)
+            showUpdateCandidateWindow(collectionName, currentVacancy)
         
         length = 0
         columns = ('Title', 'VacancyDescription', 'Salary', 'Status')
@@ -1153,8 +1146,6 @@ def showUpdateVacancyWindow(collectionName, currentVacancy):
     def buttonUpdateClicked():
         currentStatus = comboBoxStatuses.get()
         updateVacancyCollectionDenormalized(oldTitle, vacancyNameEntry, vacancyDescriptionEntry, salaryEntry, currentStatus)
-        root.destroy()
-        updateWindow(collectionName)
     
     currentCollection = Label(root, text=f'Выбранная коллекция : {collectionName}', font='Arial 12 bold', bg='#FFE4C4')
     currentCollection.pack(pady=5)
@@ -1296,8 +1287,6 @@ def updateEmployerDenormalized(oldValues, collectionName, currentVacancy):
     def buttonUpdateClicked():
         oldName = oldValues['CompanyName']
         updateEmployerCollectionDenormalized(currentVacancy, oldName, companyNameEntry, companyDescriptionEntry, addressCityEntry, addressStreetEntry, addressHouseEntry)
-        root.destroy()
-        showUpdateEmployerWindow(collectionName, currentVacancy)
     
     ySize = 400
 
@@ -1347,6 +1336,161 @@ def updateEmployerDenormalized(oldValues, collectionName, currentVacancy):
     addressHouseEntry.grid(row=5, column=1, sticky='w', pady=5)
     addressHouseVariable.set(oldValues['AddressHouse'])
     
+    buttonUpdate = Button(root, text='Изменить', command=buttonUpdateClicked)
+    buttonUpdate.pack(pady=5)
+    buttonUpdate.config(font='Arial 12 bold', bg='#FFCA8A')
+
+    buttonBack = Button(root, text='Вернуться назад', command=buttonBackClicked)
+    buttonBack.pack(pady=5)
+    buttonBack.config(font='Arial 12 bold', bg='#FFCA8A')
+
+    root.title('Обновление данных')
+    root.geometry(f'450x{ySize}+550+250')
+    root.resizable(False, False)
+    root['bg'] = '#FFE4C4'
+    root.mainloop()
+
+#Окно выбора изменения кандидата (денормализованная коллекция)
+def showUpdateCandidateWindow(collectionName, currentVacancy):
+    root = Tk()
+
+    def buttonBackClicked():
+        root.destroy()
+        updateWindow(collectionName)
+    
+    def updateData(oldValues, collectionName, currentVacancy):
+        root.destroy()
+        updateCandidateDenormalized(oldValues, collectionName, currentVacancy)
+    
+    ySize = 150
+    
+    currentCollection = Label(root, text=f'Выбранная коллекция : {collectionName}', font='Arial 12 bold', bg='#FFE4C4')
+    currentCollection.pack(pady=5)
+
+    changeText = Label(root, text=f'Измените данные', font='Arial 12 bold', bg='#FFE4C4')
+    changeText.pack(pady=5)
+
+    allRecords = database['DB'][f'{collectionName}'].find({'Title': currentVacancy})
+
+    length = 0
+
+    columns = ('Name', 'Gender', 'DateOfBirth', 'Stage', 'PhoneNumber')
+    table = ttk.Treeview(columns=columns, show='headings')
+    table.pack()
+
+    style = ttk.Style()
+    style.configure("Treeview", rowheight=50)
+
+    table.tag_configure('data', background="#EDD1AF")
+    table.heading('Name', text='ФИО кандидата')
+    table.heading('Gender', text='Пол')
+    table.heading('DateOfBirth', text='Дата рождения')
+    table.heading('Stage', text='Опыт работы')
+    table.heading('PhoneNumber', text='Номер телефона')
+
+    table.column('#1', width=130)
+    table.column('#2', width=80)
+    table.column('#3', width=120)
+    table.column('#4', width=80)
+    table.column('#5', width=150)
+
+    for document in allRecords:
+        recordCandidate = document['Candidates']
+        for record in recordCandidate:
+            length += 1
+            ySize += 50
+
+            name = record['Name']
+            gender = record['Gender']
+            dateOfBirth = record['DateOfBirth']
+            stage = record['Stage']
+            phoneNumber = record['PhoneNumber']
+
+            parsedRecord = (name, gender, dateOfBirth, stage, phoneNumber)
+            table.insert('', END, values=parsedRecord, tags=('data',))
+    table['height'] = length
+
+    def itemSelected(event):
+        selectedStrings = ''
+        for selected in table.selection():
+            item = table.item(selected)
+            string = item['values']
+            oldValues = {'Name': string[0], 'Gender': string[1], 'DateOfBirth': string[2], 'Stage': string[3], 'PhoneNumber': string[4]}
+            updateData(oldValues, collectionName, currentVacancy)
+    table.bind("<<TreeviewSelect>>", itemSelected)
+
+    buttonBack = Button(root, text='Вернуться назад', command=buttonBackClicked)
+    buttonBack.pack(pady=5)
+    buttonBack.config(font='Arial 12 bold', bg='#FFCA8A')
+
+    root.title('Обновление данных')
+    root.geometry(f'700x{ySize}+550+250')
+    root.resizable(False, False)
+    root['bg'] = '#FFE4C4'
+    root.mainloop()
+
+#Окно изменения кандидата (денормализовання коллекция)
+def updateCandidateDenormalized(oldValues, collectionName, currentVacancy):
+    root = Tk()
+
+    ySize = 400
+
+    def buttonBackClicked():
+        root.destroy()
+        showUpdateCandidateWindow(collectionName, currentVacancy)
+    
+    def buttonUpdateClicked():
+        oldName = oldValues['Name']
+        currentGender = comboBoxGender.get()
+        updateCandidateCollectionDenormalized(currentVacancy, oldName, candidateNameEntry, currentGender, dateOfBirthEntry, stageEntry, phoneNumberEntry)
+    
+    currentCollection = Label(root, text=f'Выбранная коллекция : {collectionName}', font='Arial 12 bold', bg='#FFE4C4')
+    currentCollection.pack(pady=5)
+
+    currentVacancyText = Label(root, text=f'Текущая вакансия : {currentVacancy}', font='Arial 12 bold', bg='#FFE4C4')
+    currentVacancyText.pack(pady=5)
+
+    changeText = Label(root, text=f'Измените данные', font='Arial 12 bold', bg='#FFE4C4')
+    changeText.pack(pady=5)
+
+    formFrame = Frame(root, bg='#FFE4C4')
+    formFrame.pack(expand=True)
+
+    candidateName = Label(formFrame, text='Имя Фамилия :', font='Arial 12 bold', bg='#FFE4C4')
+    candidateName.grid(row=1, column=0, sticky='w')
+    candidateNameVariable = StringVar()
+    candidateNameEntry = Entry(formFrame, textvariable=candidateNameVariable, font='Arial 12')
+    candidateNameEntry.grid(row=1, column=1, sticky='w', pady=5)
+    candidateNameVariable.set(oldValues['Name'])
+
+    genderLabel = Label(formFrame, text='Пол :', font='Arial 12 bold', bg='#FFE4C4')
+    genderLabel.grid(row=2, column=0, sticky='w')
+    genders = ['Male', 'Female']
+    genderVar = StringVar(value=oldValues['Gender'])
+    comboBoxGender = ttk.Combobox(formFrame, font='Arial 12', textvariable=genderVar, values=genders, state='readonly')
+    comboBoxGender.grid(row=2, column=1, sticky='w', pady=5)
+
+    dateOfBirth = Label(formFrame, text='Дата рождения :', font='Arial 12 bold', bg='#FFE4C4')
+    dateOfBirth.grid(row=3, column=0, sticky='w')
+    dateOfBirthVariable = StringVar()
+    dateOfBirthEntry = Entry(formFrame, textvariable=dateOfBirthVariable, font='Arial 12')
+    dateOfBirthEntry.grid(row=3, column=1, sticky='w', pady=5)
+    dateOfBirthVariable.set(oldValues['DateOfBirth'])
+
+    stage = Label(formFrame, text='Опыт работы :', font='Arial 12 bold', bg='#FFE4C4')
+    stage.grid(row=4, column=0, sticky='w')
+    stageVariable = StringVar()
+    stageEntry = Entry(formFrame, textvariable=stageVariable, font='Arial 12')
+    stageEntry.grid(row=4, column=1, sticky='w', pady=5)
+    stageVariable.set(oldValues['Stage'])
+
+    phoneNumber = Label(formFrame, text='Номер телефона : ', font='Arial 12 bold', bg='#FFE4C4')
+    phoneNumber.grid(row=5, column=0, sticky='w')
+    phoneNumberVariable = StringVar()
+    phoneNumberEntry = Entry(formFrame, textvariable=phoneNumberVariable, font='Arial 12')
+    phoneNumberEntry.grid(row=5, column=1, sticky='w', pady=5)
+    phoneNumberVariable.set(oldValues['PhoneNumber'])
+
     buttonUpdate = Button(root, text='Изменить', command=buttonUpdateClicked)
     buttonUpdate.pack(pady=5)
     buttonUpdate.config(font='Arial 12 bold', bg='#FFCA8A')

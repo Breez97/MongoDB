@@ -221,14 +221,36 @@ def updateEmployerCollectionDenormalized(currentVacancy, oldName, companyNameEnt
         showerror(title='Ошибка', message='Заполните все данные')
     else:
         database['DB']['DenormalizedDocument'].update_one(
-        {'Title': currentVacancy, 'Employers.CompanyName': oldName},
-        {'$set': {
-            'Employers.$.CompanyName': companyNameUpdate,
-            'Employers.$.CompanyDescription': companyDescriptionUpdate,
-            'Employers.$.AddressCity': addressCityUpdate,
-            'Employers.$.AddressStreet': addressStreetUpdate,
-            'Employers.$.AddressHouse': addressHouseUpdate}
-        }
+            {'Title': currentVacancy, 'Employers.CompanyName': oldName},
+            {'$set': {
+                'Employers.$.CompanyName': companyNameUpdate,
+                'Employers.$.CompanyDescription': companyDescriptionUpdate,
+                'Employers.$.AddressCity': addressCityUpdate,
+                'Employers.$.AddressStreet': addressStreetUpdate,
+                'Employers.$.AddressHouse': addressHouseUpdate
+                }
+            }
         )
+        showinfo(title='Инфо', message='Данные успешно обновлены')
 
+#Функция обновления данных кандидата (денормализованная коллекция)
+def updateCandidateCollectionDenormalized(currentVacancy, oldName, candidateNameEntry, currentGender, dateOfBirthEntry, stageEntry, phoneNumberEntry):
+    candidateNameUpdate = candidateNameEntry.get()
+    dateOfBirthUpdate = dateOfBirthEntry.get()
+    stageUpdate = stageEntry.get()
+    phoneNumberUpdate = phoneNumberEntry.get()
+    if(candidateNameUpdate == '' or dateOfBirthUpdate == '' or stageUpdate == '' or phoneNumberUpdate == ''):
+        showerror(title='Ошибка', message='Заполните все данные')
+    else:
+        database['DB']['DenormalizedDocument'].update_one(
+            {'Title': currentVacancy, 'Candidates.Name': oldName},
+            {'$set': {
+                'Candidates.$.Name': candidateNameUpdate,
+                'Candidates.$.Gender': currentGender,
+                'Candidates.$.DateOfBirth': dateOfBirthUpdate,
+                'Candidates.$.Stage': stageUpdate,
+                'Candidates.$.PhoneNumber': phoneNumberUpdate
+                }
+            }
+        )
         showinfo(title='Инфо', message='Данные успешно обновлены')
