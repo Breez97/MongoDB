@@ -53,9 +53,15 @@ def addingCandidateCollection(currentTitle, candidateNameEntry, currentGender, d
         if existingDocument > 0:
             showerror(title='Ошибка', message='Кандидат с таким именем уже зарегистрирован на данную вакансию')
         else:
-            dictAdd = {'VacancyDocument_id': record['_id'], 'Name': candidateNameAdd, 'Gender': currentGender, 'DateOfBirth': dateOfBirthAdd, 'Stage': stageAdd, 'PhoneNumber': phoneNumberAdd}
-            database['DB']['CandidateDocument'].insert_one(dictAdd)
-            showinfo(title='Инфо', message='Данные успешно добавлены')
+            existingPhoneNumber = database['DB']['CandidateDocument'].count_documents({'PhoneNumber': phoneNumberAdd})
+            if existingPhoneNumber > 0:
+                showerror(title='Ошибка', message='Введите уникальный номер телефона')
+            else
+            {
+                dictAdd = {'VacancyDocument_id': record['_id'], 'Name': candidateNameAdd, 'Gender': currentGender, 'DateOfBirth': dateOfBirthAdd, 'Stage': stageAdd, 'PhoneNumber': phoneNumberAdd}
+                database['DB']['CandidateDocument'].insert_one(dictAdd)
+                showinfo(title='Инфо', message='Данные успешно добавлены')
+            }
 
 #Функция измения вакансии (главная коллекция)
 def updateVacancyCollection(oldTitle, vacancyNameEntry, vacancyDescriptionEntry, salaryEntry, currentStatus):
@@ -108,10 +114,14 @@ def updateCandidateCollection(oldName, currentTitle, candidateNameEntry, current
         if existingDocument > 0:
             showerror(title='Ошибка', message='Кандидат с таким именем уже зарегистрирован на данную вакансию')
         else:
-            oldValues = {'Name': oldName}
-            newValues = {'$set': {'VacancyDocument_id': record['_id'], 'Name': candidateNameUpdate, 'Gender': currentGender, 'DateOfBirth': dateOfBirthUpdate, 'Stage': stageUpdate, 'PhoneNumber': phoneNumberUpdate}}
-            database['DB']['CandidateDocument'].update_one(oldValues, newValues)
-            showinfo(title='Инфо', message='Данные успешно обновлены')
+            existingPhoneNumber = database['DB']['CandidateDocument'].count_documents({'PhoneNumber': phoneNumberUpdate})
+            if existingPhoneNumber > 0:
+                showerror(title='Ошибка', message='Введите уникальный номер телефона')
+            else:
+                oldValues = {'Name': oldName}
+                newValues = {'$set': {'VacancyDocument_id': record['_id'], 'Name': candidateNameUpdate, 'Gender': currentGender, 'DateOfBirth': dateOfBirthUpdate, 'Stage': stageUpdate, 'PhoneNumber': phoneNumberUpdate}}
+                database['DB']['CandidateDocument'].update_one(oldValues, newValues)
+                showinfo(title='Инфо', message='Данные успешно обновлены')
 
 #Функция удаления вакансий (главная коллекция)
 def deleteVacancyCollection(title):
