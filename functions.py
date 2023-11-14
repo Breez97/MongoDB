@@ -5,7 +5,7 @@ from tkinter.messagebox import showerror, showinfo
 
 #Изменение размера окна в зависимости от количества коллекций
 def windowSize(collections):
-    resizeY = 110
+    resizeY = 160
     for i in range(0, len(collections)):
         resizeY += 50
     return resizeY

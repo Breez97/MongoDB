@@ -2,6 +2,10 @@ from functions import *
 
 database = MongoClient()
 collections = database['DB'].list_collection_names()
+collectionToExclude = 'JoinedCollections'
+filteredCollections = [col for col in collections if col != collectionToExclude]
+collections = filteredCollections
+
 
 #Функция добавления вакансий (главная коллекция)
 def addingVacancyCollection(vacancyNameEntry, vacancyDescriptionEntry, salaryEntry, currentStatus):
@@ -293,11 +297,12 @@ def deleteCandidateCollectionDenormalized(oldValues, currentVacancy):
     database['DB']['DenormalizedDocument'].update_one({'Title': currentVacancy}, {'$pull': {'Candidates' : {'Name': oldValues['Name']}}})
     showinfo(title='Инфо', message='Данные успешно удалены')
 
-#Функция объединения коллекций
+#Функция объединения коллекций (JOIN)
 def joinCollections():
     client = MongoClient()
     session = client.start_session()
     db = database['DB']
+    database['DB']['JoinedCollections'].drop()
     
     result = db['VacancyDocument'].aggregate([
         {
