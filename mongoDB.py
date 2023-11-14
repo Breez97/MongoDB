@@ -1,4 +1,5 @@
 from common import *
+from validation import *
 
 #Добавление денормазилованной вакансии
 def addVacancyDenormalized(collectionName):
@@ -20,10 +21,14 @@ def addVacancyDenormalized(collectionName):
     formFrame = Frame(root, bg='#FFE4C4')
     formFrame.pack(expand=True)
 
+    checkNameTitle = (root.register(limitNameTitle), '%P')
+    checkNumber = (root.register(limitNumber), '%P')
+
     vacancyName = Label(formFrame, text='Название вакансии : ', font='Arial 12 bold', bg='#FFE4C4')
     vacancyName.grid(row=0, column=0, sticky='w')
     vacancyNameEntry = Entry(formFrame, font='Arial 12')
     vacancyNameEntry.grid(row=0, column=1, sticky='w', pady=5)
+    vacancyNameEntry.configure(validate='key', validatecommand=checkNameTitle)
 
     vacancyDescription = Label(formFrame, text='Описание вакансии : ', font='Arial 12 bold', bg='#FFE4C4')
     vacancyDescription.grid(row=1, column=0, sticky='w')
@@ -34,6 +39,7 @@ def addVacancyDenormalized(collectionName):
     salary.grid(row=2, column=0, sticky='w')
     salaryEntry = Entry(formFrame, font='Arial 12')
     salaryEntry.grid(row=2, column=1, sticky='w', pady=5)
+    salaryEntry.configure(validate='key', validatecommand=checkNumber)
 
     status = Label(formFrame, text='Статус : ', font='Arial 12 bold', bg='#FFE4C4')
     status.grid(row=3, column=0, sticky='w')
@@ -81,6 +87,9 @@ def addEmployerDenormalized(collectionName):
     for record in records:
         titles.append(record['Title'])
 
+    checkNameTitle = (root.register(limitNameTitle), '%P')
+    checkNumber = (root.register(limitNumber), '%P')
+
     vacancyName = Label(formFrame, text='Название вакансии :', font='Arial 12 bold', bg='#FFE4C4')
     vacancyName.grid(row=0, column=0, sticky='w')
     titlesVar = StringVar(value=titles[0])
@@ -91,6 +100,7 @@ def addEmployerDenormalized(collectionName):
     companyName.grid(row=1, column=0, sticky='w')
     companyNameEntry = Entry(formFrame, font='Arial 12')
     companyNameEntry.grid(row=1, column=1, sticky='w', pady=5)
+    companyNameEntry.configure(validate='key', validatecommand=checkNameTitle)
 
     companyDescription = Label(formFrame, text='Описание компании : ', font='Arial 12 bold', bg='#FFE4C4')
     companyDescription.grid(row=2, column=0, sticky='w')
@@ -101,16 +111,19 @@ def addEmployerDenormalized(collectionName):
     addressCity.grid(row=3, column=0, sticky='w')
     addressCityEntry = Entry(formFrame, font='Arial 12')
     addressCityEntry.grid(row=3, column=1, sticky='w', pady=5)
+    addressCityEntry.configure(validate='key', validatecommand=checkNameTitle)
 
     addressStreet = Label(formFrame, text='Улица : ', font='Arial 12 bold', bg='#FFE4C4')
     addressStreet.grid(row=4, column=0, sticky='w')
     addressStreetEntry = Entry(formFrame, font='Arial 12')
     addressStreetEntry.grid(row=4, column=1, sticky='w', pady=5)
+    addressStreetEntry.configure(validate='key', validatecommand=checkNameTitle)
 
     addressHouse = Label(formFrame, text='Дом : ', font='Arial 12 bold', bg='#FFE4C4')
     addressHouse.grid(row=5, column=0, sticky='w')
     addressHouseEntry = Entry(formFrame, font='Arial 12')
     addressHouseEntry.grid(row=5, column=1, sticky='w', pady=5)
+    addressHouseEntry.configure(validate='key', validatecommand=checkNumber)
 
     buttonAdd = Button(root, text='Добавить', command=buttonAddClicked)
     buttonAdd.pack(pady=5)
@@ -151,6 +164,10 @@ def addCandidateDenormalized(collectionName):
         addingCandidateDenormalized(currentTitle, candidateNameEntry, currentGender, dateOfBirthEntry, stageEntry, phoneNumberEntry)
 
     ySize = 340
+
+    checkNameTitle = (root.register(limitNameTitle), '%P')
+    checkDate = (root.register(limitDate), '%P')
+    checkNumber = (root.register(limitNumber), '%P')
         
     vacancyName = Label(formFrame, text='Название вакансии :', font='Arial 12 bold', bg='#FFE4C4')
     vacancyName.grid(row=0, column=0, sticky='w')
@@ -162,6 +179,7 @@ def addCandidateDenormalized(collectionName):
     candidateName.grid(row=1, column=0, sticky='w')
     candidateNameEntry = Entry(formFrame, font='Arial 12')
     candidateNameEntry.grid(row=1, column=1, sticky='w', pady=5)
+    candidateNameEntry.configure(validate='key', validatecommand=checkNameTitle)
 
     genderLabel = Label(formFrame, text='Пол :', font='Arial 12 bold', bg='#FFE4C4')
     genderLabel.grid(row=2, column=0, sticky='w')
@@ -174,17 +192,19 @@ def addCandidateDenormalized(collectionName):
     dateOfBirth.grid(row=3, column=0, sticky='w')
     dateOfBirthEntry = Entry(formFrame, font='Arial 12')
     dateOfBirthEntry.grid(row=3, column=1, sticky='w', pady=5)
+    dateOfBirthEntry.configure(validate='key', validatecommand=checkDate)
 
     stage = Label(formFrame, text='Опыт работы :', font='Arial 12 bold', bg='#FFE4C4')
     stage.grid(row=4, column=0, sticky='w')
     stageEntry = Entry(formFrame, font='Arial 12')
     stageEntry.grid(row=4, column=1, sticky='w', pady=5)
+    stageEntry.configure(validate='key', validatecommand=checkNumber)
 
     phoneNumber = Label(formFrame, text='Номер телефона : ', font='Arial 12 bold', bg='#FFE4C4')
     phoneNumber.grid(row=5, column=0, sticky='w')
     phoneNumberEntry = Entry(formFrame, font='Arial 12')
     phoneNumberEntry.grid(row=5, column=1, sticky='w', pady=5)
-
+    phoneNumberEntry.configure(validate='key', validatecommand=checkNumber)
     
     buttonAdd = Button(root, text='Добавить', command=buttonAddClicked)
     buttonAdd.pack(pady=5)
@@ -226,6 +246,10 @@ def createWindow(collectionName):
     formFrame = Frame(root, bg='#FFE4C4')
     formFrame.pack(expand=True)
 
+    checkNameTitle = (root.register(limitNameTitle), '%P')
+    checkDate = (root.register(limitDate), '%P')
+    checkNumber = (root.register(limitNumber), '%P')
+
     records = database['DB']['VacancyDocument'].find()
     titles = []
     for record in records:
@@ -237,6 +261,7 @@ def createWindow(collectionName):
         vacancyName.grid(row=0, column=0, sticky='w')
         vacancyNameEntry = Entry(formFrame, font='Arial 12')
         vacancyNameEntry.grid(row=0, column=1, sticky='w', pady=5)
+        vacancyNameEntry.configure(validate='key', validatecommand=checkNameTitle)
 
         vacancyDescription = Label(formFrame, text='Описание вакансии : ', font='Arial 12 bold', bg='#FFE4C4')
         vacancyDescription.grid(row=1, column=0, sticky='w')
@@ -247,6 +272,7 @@ def createWindow(collectionName):
         salary.grid(row=2, column=0, sticky='w')
         salaryEntry = Entry(formFrame, font='Arial 12')
         salaryEntry.grid(row=2, column=1, sticky='w', pady=5)
+        salaryEntry.configure(validate='key', validatecommand=checkNumber)
 
         status = Label(formFrame, text='Статус : ', font='Arial 12 bold', bg='#FFE4C4')
         status.grid(row=3, column=0, sticky='w')
@@ -272,6 +298,7 @@ def createWindow(collectionName):
         companyName.grid(row=1, column=0, sticky='w')
         companyNameEntry = Entry(formFrame, font='Arial 12')
         companyNameEntry.grid(row=1, column=1, sticky='w', pady=5)
+        companyNameEntry.configure(validate='key', validatecommand=checkNameTitle)
 
         companyDescription = Label(formFrame, text='Описание компании : ', font='Arial 12 bold', bg='#FFE4C4')
         companyDescription.grid(row=2, column=0, sticky='w')
@@ -282,16 +309,19 @@ def createWindow(collectionName):
         addressCity.grid(row=3, column=0, sticky='w')
         addressCityEntry = Entry(formFrame, font='Arial 12')
         addressCityEntry.grid(row=3, column=1, sticky='w', pady=5)
+        addressCityEntry.configure(validate='key', validatecommand=checkNameTitle)
 
         addressStreet = Label(formFrame, text='Улица : ', font='Arial 12 bold', bg='#FFE4C4')
         addressStreet.grid(row=4, column=0, sticky='w')
         addressStreetEntry = Entry(formFrame, font='Arial 12')
         addressStreetEntry.grid(row=4, column=1, sticky='w', pady=5)
+        addressStreetEntry.configure(validate='key', validatecommand=checkNameTitle)
 
         addressHouse = Label(formFrame, text='Дом : ', font='Arial 12 bold', bg='#FFE4C4')
         addressHouse.grid(row=5, column=0, sticky='w')
         addressHouseEntry = Entry(formFrame, font='Arial 12')
         addressHouseEntry.grid(row=5, column=1, sticky='w', pady=5)
+        addressHouseEntry.configure(validate='key', validatecommand=checkNumber)
 
         buttonAdd = Button(root, text='Добавить', command=buttonAddClicked)
         buttonAdd.pack(pady=5)
@@ -310,6 +340,7 @@ def createWindow(collectionName):
         candidateName.grid(row=1, column=0, sticky='w')
         candidateNameEntry = Entry(formFrame, font='Arial 12')
         candidateNameEntry.grid(row=1, column=1, sticky='w', pady=5)
+        candidateNameEntry.configure(validate='key', validatecommand=checkNameTitle)
 
         genderLabel = Label(formFrame, text='Пол :', font='Arial 12 bold', bg='#FFE4C4')
         genderLabel.grid(row=2, column=0, sticky='w')
@@ -322,16 +353,19 @@ def createWindow(collectionName):
         dateOfBirth.grid(row=3, column=0, sticky='w')
         dateOfBirthEntry = Entry(formFrame, font='Arial 12')
         dateOfBirthEntry.grid(row=3, column=1, sticky='w', pady=5)
+        dateOfBirthEntry.configure(validate='key', validatecommand=checkDate)
 
         stage = Label(formFrame, text='Опыт работы :', font='Arial 12 bold', bg='#FFE4C4')
         stage.grid(row=4, column=0, sticky='w')
         stageEntry = Entry(formFrame, font='Arial 12')
         stageEntry.grid(row=4, column=1, sticky='w', pady=5)
+        stageEntry.configure(validate='key', validatecommand=checkNumber)
 
         phoneNumber = Label(formFrame, text='Номер телефона : ', font='Arial 12 bold', bg='#FFE4C4')
         phoneNumber.grid(row=5, column=0, sticky='w')
         phoneNumberEntry = Entry(formFrame, font='Arial 12')
         phoneNumberEntry.grid(row=5, column=1, sticky='w', pady=5)
+        phoneNumberEntry.configure(validate='key', validatecommand=checkNumber)
 
         buttonAdd = Button(root, text='Добавить', command=buttonAddClicked)
         buttonAdd.pack(pady=5)
@@ -682,13 +716,19 @@ def updateVacancyDocument(oldValues, collectionName):
     formFrame = Frame(root, bg='#FFE4C4')
     formFrame.pack(expand=True)
 
+    checkNameTitle = (root.register(limitNameTitle), '%P')
+    checkDate = (root.register(limitDate), '%P')
+    checkNumber = (root.register(limitNumber), '%P')
+
     ySize = 330
+
     vacancyName = Label(formFrame, text='Название вакансии : ', font='Arial 12 bold', bg='#FFE4C4')
     vacancyName.grid(row=0, column=0, sticky='w')
     vacancyNameVariable = StringVar()
     vacancyNameEntry = Entry(formFrame, textvariable=vacancyNameVariable, font='Arial 12')
     vacancyNameEntry.grid(row=0, column=1, sticky='w', pady=5)
     vacancyNameVariable.set(oldValues['Title'])
+    vacancyNameEntry.configure(validate='key', validatecommand=checkNameTitle)
 
     vacancyDescription = Label(formFrame, text='Описание вакансии : ', font='Arial 12 bold', bg='#FFE4C4')
     vacancyDescription.grid(row=1, column=0, sticky='w')
@@ -702,6 +742,7 @@ def updateVacancyDocument(oldValues, collectionName):
     salaryEntry = Entry(formFrame, textvariable=salaryEntryVariable, font='Arial 12')
     salaryEntry.grid(row=2, column=1, sticky='w', pady=5)
     salaryEntryVariable.set(oldValues['Salary'])
+    salaryEntry.configure(validate='key', validatecommand=checkNumber)
 
     status = Label(formFrame, text='Статус : ', font='Arial 12 bold', bg='#FFE4C4')
     status.grid(row=3, column=0, sticky='w')
@@ -744,6 +785,11 @@ def updateEmployerDocument(oldValues, collectionName):
 
     formFrame = Frame(root, bg='#FFE4C4')
     formFrame.pack(expand=True)
+
+    checkNameTitle = (root.register(limitNameTitle), '%P')
+    checkDate = (root.register(limitDate), '%P')
+    checkNumber = (root.register(limitNumber), '%P')
+
     ySize = 400
 
     vacancyName = Label(formFrame, text='Название вакансии :', font='Arial 12 bold', bg='#FFE4C4')
@@ -762,6 +808,7 @@ def updateEmployerDocument(oldValues, collectionName):
     companyNameEntry = Entry(formFrame, textvariable=companyNameVariable, font='Arial 12')
     companyNameEntry.grid(row=1, column=1, sticky='w', pady=5)
     companyNameVariable.set(oldValues['CompanyName'])
+    companyNameEntry.configure(validate='key', validatecommand=checkNameTitle)
 
     companyDescription = Label(formFrame, text='Описание компании : ', font='Arial 12 bold', bg='#FFE4C4')
     companyDescription.grid(row=2, column=0, sticky='w')
@@ -775,6 +822,7 @@ def updateEmployerDocument(oldValues, collectionName):
     addressCityEntry = Entry(formFrame, textvariable=addressCityEntryVariable, font='Arial 12')
     addressCityEntry.grid(row=3, column=1, sticky='w', pady=5)
     addressCityEntryVariable.set(oldValues['AddressCity'])
+    addressCityEntry.configure(validate='key', validatecommand=checkNameTitle)
 
     addressStreet = Label(formFrame, text='Улица : ', font='Arial 12 bold', bg='#FFE4C4')
     addressStreet.grid(row=4, column=0, sticky='w')
@@ -782,6 +830,7 @@ def updateEmployerDocument(oldValues, collectionName):
     addressStreetEntry = Entry(formFrame, textvariable=addressStreetVariable, font='Arial 12')
     addressStreetEntry.grid(row=4, column=1, sticky='w', pady=5)
     addressStreetVariable.set(oldValues['AddressStreet'])
+    addressStreetEntry.configure(validate='key', validatecommand=checkNameTitle)
 
     addressHouse = Label(formFrame, text='Дом : ', font='Arial 12 bold', bg='#FFE4C4')
     addressHouse.grid(row=5, column=0, sticky='w')
@@ -789,6 +838,7 @@ def updateEmployerDocument(oldValues, collectionName):
     addressHouseEntry = Entry(formFrame, textvariable=addressHouseVariable, font='Arial 12')
     addressHouseEntry.grid(row=5, column=1, sticky='w', pady=5)
     addressHouseVariable.set(oldValues['AddressHouse'])
+    addressHouseEntry.configure(validate='key', validatecommand=checkNumber)
 
     buttonUpdate = Button(root, text='Изменить', command=buttonUpdateClicked)
     buttonUpdate.pack(pady=5)
@@ -825,6 +875,11 @@ def updateCandidateDocument(oldValues, collectionName):
 
     formFrame = Frame(root, bg='#FFE4C4')
     formFrame.pack(expand=True)
+
+    checkNameTitle = (root.register(limitNameTitle), '%P')
+    checkDate = (root.register(limitDate), '%P')
+    checkNumber = (root.register(limitNumber), '%P')
+
     ySize = 400
         
     vacancyName = Label(formFrame, text='Название вакансии :', font='Arial 12 bold', bg='#FFE4C4')
@@ -843,6 +898,7 @@ def updateCandidateDocument(oldValues, collectionName):
     candidateNameEntry = Entry(formFrame, textvariable=candidateNameVariable, font='Arial 12')
     candidateNameEntry.grid(row=1, column=1, sticky='w', pady=5)
     candidateNameVariable.set(oldValues['Name'])
+    candidateNameEntry.configure(validate='key', validatecommand=checkNameTitle)
 
     genderLabel = Label(formFrame, text='Пол :', font='Arial 12 bold', bg='#FFE4C4')
     genderLabel.grid(row=2, column=0, sticky='w')
@@ -857,6 +913,7 @@ def updateCandidateDocument(oldValues, collectionName):
     dateOfBirthEntry = Entry(formFrame, textvariable=dateOfBirthVariable, font='Arial 12')
     dateOfBirthEntry.grid(row=3, column=1, sticky='w', pady=5)
     dateOfBirthVariable.set(oldValues['DateOfBirth'])
+    dateOfBirthEntry.configure(validate='key', validatecommand=checkDate)
 
     stage = Label(formFrame, text='Опыт работы :', font='Arial 12 bold', bg='#FFE4C4')
     stage.grid(row=4, column=0, sticky='w')
@@ -864,6 +921,7 @@ def updateCandidateDocument(oldValues, collectionName):
     stageEntry = Entry(formFrame, textvariable=stageVariable, font='Arial 12')
     stageEntry.grid(row=4, column=1, sticky='w', pady=5)
     stageVariable.set(oldValues['Stage'])
+    stageEntry.configure(validate='key', validatecommand=checkNumber)
 
     phoneNumber = Label(formFrame, text='Номер телефона : ', font='Arial 12 bold', bg='#FFE4C4')
     phoneNumber.grid(row=5, column=0, sticky='w')
@@ -871,6 +929,7 @@ def updateCandidateDocument(oldValues, collectionName):
     phoneNumberEntry = Entry(formFrame, textvariable=phoneNumberVariable, font='Arial 12')
     phoneNumberEntry.grid(row=5, column=1, sticky='w', pady=5)
     phoneNumberVariable.set(oldValues['PhoneNumber'])
+    phoneNumberEntry.configure(validate='key', validatecommand=checkNumber)
 
     buttonUpdate = Button(root, text='Изменить', command=buttonUpdateClicked)
     buttonUpdate.pack(pady=5)
@@ -911,6 +970,7 @@ def updateWindow(collectionName):
     changeLabel.pack(pady=10)
 
     allRecords = database['DB'][f'{collectionName}'].find()
+
     ySize = 200
     
     if collectionName == 'VacancyDocument':
@@ -1162,13 +1222,19 @@ def showUpdateVacancyWindow(collectionName, currentVacancy):
     formFrame = Frame(root, bg='#FFE4C4')
     formFrame.pack(expand=True)
 
+    checkNameTitle = (root.register(limitNameTitle), '%P')
+    checkDate = (root.register(limitDate), '%P')
+    checkNumber = (root.register(limitNumber), '%P')
+
     ySize = 330
+
     vacancyName = Label(formFrame, text='Название вакансии : ', font='Arial 12 bold', bg='#FFE4C4')
     vacancyName.grid(row=0, column=0, sticky='w')
     vacancyNameEntryVariable = StringVar()
     vacancyNameEntry = Entry(formFrame, text=vacancyNameEntryVariable, font='Arial 12')
     vacancyNameEntry.grid(row=0, column=1, sticky='w')
     vacancyNameEntryVariable.set(record['Title'])
+    vacancyNameEntry.configure(validate='key', validatecommand=checkNameTitle)
 
     vacancyDescription = Label(formFrame, text='Описание вакансии : ', font='Arial 12 bold', bg='#FFE4C4')
     vacancyDescription.grid(row=1, column=0, sticky='w')
@@ -1182,6 +1248,7 @@ def showUpdateVacancyWindow(collectionName, currentVacancy):
     salaryEntry = Entry(formFrame, textvariable=salaryEntryVariable, font='Arial 12')
     salaryEntry.grid(row=2, column=1, sticky='w', pady=5)
     salaryEntryVariable.set(record['Salary'])
+    salaryEntry.configure(validate='key', validatecommand=checkNumber)
 
     status = Label(formFrame, text='Статус : ', font='Arial 12 bold', bg='#FFE4C4')
     status.grid(row=3, column=0, sticky='w')
@@ -1294,6 +1361,10 @@ def updateEmployerDenormalized(oldValues, collectionName, currentVacancy):
         oldName = oldValues['CompanyName']
         updateEmployerCollectionDenormalized(currentVacancy, oldName, companyNameEntry, companyDescriptionEntry, addressCityEntry, addressStreetEntry, addressHouseEntry)
     
+    checkNameTitle = (root.register(limitNameTitle), '%P')
+    checkDate = (root.register(limitDate), '%P')
+    checkNumber = (root.register(limitNumber), '%P')
+    
     ySize = 400
 
     currentCollection = Label(root, text=f'Выбранная коллекция : {collectionName}', font='Arial 12 bold', bg='#FFE4C4')
@@ -1314,6 +1385,7 @@ def updateEmployerDenormalized(oldValues, collectionName, currentVacancy):
     companyNameEntry = Entry(formFrame, textvariable=companyNameVariable, font='Arial 12')
     companyNameEntry.grid(row=1, column=1, sticky='w', pady=5)
     companyNameVariable.set(oldValues['CompanyName'])
+    companyNameEntry.configure(validate='key', validatecommand=checkNameTitle)
 
     companyDescription = Label(formFrame, text='Описание компании : ', font='Arial 12 bold', bg='#FFE4C4')
     companyDescription.grid(row=2, column=0, sticky='w')
@@ -1327,6 +1399,7 @@ def updateEmployerDenormalized(oldValues, collectionName, currentVacancy):
     addressCityEntry = Entry(formFrame, textvariable=addressCityEntryVariable, font='Arial 12')
     addressCityEntry.grid(row=3, column=1, sticky='w', pady=5)
     addressCityEntryVariable.set(oldValues['AddressCity'])
+    addressCityEntry.configure(validate='key', validatecommand=checkNameTitle)
 
     addressStreet = Label(formFrame, text='Улица : ', font='Arial 12 bold', bg='#FFE4C4')
     addressStreet.grid(row=4, column=0, sticky='w')
@@ -1334,6 +1407,7 @@ def updateEmployerDenormalized(oldValues, collectionName, currentVacancy):
     addressStreetEntry = Entry(formFrame, textvariable=addressStreetVariable, font='Arial 12')
     addressStreetEntry.grid(row=4, column=1, sticky='w', pady=5)
     addressStreetVariable.set(oldValues['AddressStreet'])
+    addressStreetEntry.configure(validate='key', validatecommand=checkNameTitle)
 
     addressHouse = Label(formFrame, text='Дом : ', font='Arial 12 bold', bg='#FFE4C4')
     addressHouse.grid(row=5, column=0, sticky='w')
@@ -1341,6 +1415,7 @@ def updateEmployerDenormalized(oldValues, collectionName, currentVacancy):
     addressHouseEntry = Entry(formFrame, textvariable=addressHouseVariable, font='Arial 12')
     addressHouseEntry.grid(row=5, column=1, sticky='w', pady=5)
     addressHouseVariable.set(oldValues['AddressHouse'])
+    addressHouseEntry.configure(validate='key', validatecommand=checkNumber)
     
     buttonUpdate = Button(root, text='Изменить', command=buttonUpdateClicked)
     buttonUpdate.pack(pady=5)
@@ -1462,12 +1537,17 @@ def updateCandidateDenormalized(oldValues, collectionName, currentVacancy):
     formFrame = Frame(root, bg='#FFE4C4')
     formFrame.pack(expand=True)
 
+    checkNameTitle = (root.register(limitNameTitle), '%P')
+    checkDate = (root.register(limitDate), '%P')
+    checkNumber = (root.register(limitNumber), '%P')
+
     candidateName = Label(formFrame, text='Имя Фамилия :', font='Arial 12 bold', bg='#FFE4C4')
     candidateName.grid(row=1, column=0, sticky='w')
     candidateNameVariable = StringVar()
     candidateNameEntry = Entry(formFrame, textvariable=candidateNameVariable, font='Arial 12')
     candidateNameEntry.grid(row=1, column=1, sticky='w', pady=5)
     candidateNameVariable.set(oldValues['Name'])
+    candidateNameEntry.configure(validate='key', validatecommand=checkNameTitle)
 
     genderLabel = Label(formFrame, text='Пол :', font='Arial 12 bold', bg='#FFE4C4')
     genderLabel.grid(row=2, column=0, sticky='w')
@@ -1482,6 +1562,7 @@ def updateCandidateDenormalized(oldValues, collectionName, currentVacancy):
     dateOfBirthEntry = Entry(formFrame, textvariable=dateOfBirthVariable, font='Arial 12')
     dateOfBirthEntry.grid(row=3, column=1, sticky='w', pady=5)
     dateOfBirthVariable.set(oldValues['DateOfBirth'])
+    dateOfBirthEntry.configure(validate='key', validatecommand=checkDate)
 
     stage = Label(formFrame, text='Опыт работы :', font='Arial 12 bold', bg='#FFE4C4')
     stage.grid(row=4, column=0, sticky='w')
@@ -1489,6 +1570,7 @@ def updateCandidateDenormalized(oldValues, collectionName, currentVacancy):
     stageEntry = Entry(formFrame, textvariable=stageVariable, font='Arial 12')
     stageEntry.grid(row=4, column=1, sticky='w', pady=5)
     stageVariable.set(oldValues['Stage'])
+    stageEntry.configure(validate='key', validatecommand=checkNumber)
 
     phoneNumber = Label(formFrame, text='Номер телефона : ', font='Arial 12 bold', bg='#FFE4C4')
     phoneNumber.grid(row=5, column=0, sticky='w')
@@ -1496,6 +1578,7 @@ def updateCandidateDenormalized(oldValues, collectionName, currentVacancy):
     phoneNumberEntry = Entry(formFrame, textvariable=phoneNumberVariable, font='Arial 12')
     phoneNumberEntry.grid(row=5, column=1, sticky='w', pady=5)
     phoneNumberVariable.set(oldValues['PhoneNumber'])
+    phoneNumberEntry.configure(validate='key', validatecommand=checkNumber)
 
     buttonUpdate = Button(root, text='Изменить', command=buttonUpdateClicked)
     buttonUpdate.pack(pady=5)
