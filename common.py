@@ -292,3 +292,57 @@ def deleteEmployerCollectionDenormalized(oldValues, currentVacancy):
 def deleteCandidateCollectionDenormalized(oldValues, currentVacancy):
     database['DB']['DenormalizedDocument'].update_one({'Title': currentVacancy}, {'$pull': {'Candidates' : {'Name': oldValues['Name']}}})
     showinfo(title='Инфо', message='Данные успешно удалены')
+
+#Функция объединения коллекций
+def joinCollections():
+    client = MongoClient()
+    session = client.start_session()
+    db = database['DB']
+    
+    result = db['VacancyDocument'].aggregate([
+        {
+            '$lookup': {
+                'from': 'EmployerDocument',
+                'localField': '_id',
+                'foreignField': 'VacancyDocument_id',
+                'as': 'employers'
+            }
+        },
+        {
+            '$lookup': {
+                'from': 'CandidateDocument',
+                'localField': '_id',
+                'foreignField': 'VacancyDocument_id',
+                'as': 'candidates'
+            }
+        },
+        {
+            '$project': {
+                '_id': 1,
+                'Title': 1,
+                'VacancyDescription': 1,
+                'Salary': 1,
+                'Status': 1,
+                'employers': {
+                    'CompanyName': 1,
+                    'CompanyDescription': 1,
+                    'AddressCity': 1,
+                    'AddressStreet': 1,
+                    'AddressHouse': 1
+                },
+                'candidates': {
+                    'Name': 1,
+                    'Gender': 1,
+                    'DateOfBirth': 1,
+                    'Stage': 1,
+                    'PhoneNumber': 1,
+                }
+            }
+        }
+    ])
+    
+    documents_to_insert = list(result)
+    
+    with session.start_transaction():
+        db['JoinedCollections'].insert_many(documents_to_insert)
+    session.end_session()

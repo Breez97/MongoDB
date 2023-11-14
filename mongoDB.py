@@ -2074,9 +2074,13 @@ def mainUI():
     
     def buttonQuitClicked():
         root.destroy()
+    
+    def buttonJoinClicked():
+        joinCollections()
+        showinfo(title='Инфо', message='Данные успешно объеденены')
 
-    textAVailable = Label(text='Available collections:', font='Arial 12 bold', bg='#FFE4C4')
-    textAVailable.pack(pady=10)
+    textAvailable = Label(text='Available collections:', font='Arial 12 bold', bg='#FFE4C4')
+    textAvailable.pack(pady=10)
 
     listAvailableCollections = availableCollections(collections)
     collectionsLabel = Label(text=listAvailableCollections, font='Arial 12', bg='#FFE4C4')
@@ -2085,13 +2089,17 @@ def mainUI():
     formFrame = Frame(root, bg='#FFE4C4')
     formFrame.pack(expand=True)
 
-    collectionsVar = StringVar(value=collections[0])
+    collectionsVar = StringVar(value=collections[2])
     comboBoxCollections = ttk.Combobox(root, font='Arial 12', textvariable=collectionsVar, values=collections, state='readonly')
     comboBoxCollections.pack()
 
     buttonConnection = Button(root, text='Подключиться', command=buttonClicked)
     buttonConnection.pack(pady=10)
     buttonConnection.config(font='Arial 12 bold', bg='#FFCA8A')
+
+    buttonJoin = Button(root, text='Объединить', command=buttonJoinClicked)
+    buttonJoin.pack(pady=10)
+    buttonJoin.config(font='Arial 12 bold', bg='#FFCA8A')
 
     buttonQuit = Button(root, text='Выйти', command=buttonQuitClicked)
     buttonQuit.pack(pady=5)
@@ -2102,7 +2110,6 @@ def mainUI():
     root.resizable(False, False)
     root['bg'] = '#FFE4C4'
     root.mainloop()
-
 
 def main():
     mainUI()
