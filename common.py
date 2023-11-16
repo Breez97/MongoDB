@@ -11,7 +11,7 @@ collections = filteredCollections
 def addingVacancyCollection(vacancyNameEntry, vacancyDescriptionEntry, salaryEntry, currentStatus):
     vacancyNameAdd = vacancyNameEntry.get()
     vacancyDescriptionAdd = vacancyDescriptionEntry.get("1.0", "end-1c")
-    salaryAdd = salaryEntry.get()
+    salaryAdd = int(salaryEntry.get())
     if vacancyNameAdd == '' or vacancyDescriptionAdd == '' or salaryAdd == '':
         showerror(title='Ошибка', message='Заполните все данные')
     else:
@@ -19,7 +19,7 @@ def addingVacancyCollection(vacancyNameEntry, vacancyDescriptionEntry, salaryEnt
         if existingDocument > 0:
             showerror(title='Ошибка', message='Такая вакансия уже зарегистрирована')
         else:
-            dictAdd = {'Title': vacancyNameAdd, 'VacancyDescription': vacancyDescriptionAdd, 'Salary': salaryAdd, 'Status': currentStatus}
+            dictAdd = {'Title': vacancyNameAdd, 'VacancyDescription': vacancyDescriptionAdd, 'Salary': salaryAdd, 'Status': bool(currentStatus)}
             database['DB']['VacancyDocument'].insert_one(dictAdd)
             showinfo(title='Инфо', message='Данные успешно добавлены')
 
@@ -30,7 +30,7 @@ def addingEmployerCollection(currentTitle, companyNameEntry, companyDescriptionE
     companyDescriptionAdd = companyDescriptionEntry.get("1.0", "end-1c")
     addressCityAdd = addressCityEntry.get()
     addressStreetAdd = addressStreetEntry.get()
-    addressHouseAdd = addressHouseEntry.get()
+    addressHouseAdd = int(addressHouseEntry.get())
     if(companyNameAdd == '' or companyDescriptionAdd == '' or addressCityAdd == '' or addressStreetAdd == '' or addressHouseAdd == ''):
         showerror(title='Ошибка', message='Заполните все данные')
     else:
@@ -48,8 +48,8 @@ def addingCandidateCollection(currentTitle, candidateNameEntry, currentGender, d
     record = database['DB']['VacancyDocument'].find_one({'Title': currentTitle})
     candidateNameAdd = candidateNameEntry.get()
     dateOfBirthAdd = dateOfBirthEntry.get()
-    stageAdd = stageEntry.get()
-    phoneNumberAdd = phoneNumberEntry.get()
+    stageAdd = int(stageEntry.get())
+    phoneNumberAdd = int(phoneNumberEntry.get())
     if(candidateNameAdd == '' or dateOfBirthAdd == '' or stageAdd == '' or phoneNumberAdd == ''):
         showerror(title='Ошибка', message='Заполните все данные')
     else:
@@ -65,7 +65,7 @@ def addingCandidateCollection(currentTitle, candidateNameEntry, currentGender, d
 def updateVacancyCollection(oldTitle, vacancyNameEntry, vacancyDescriptionEntry, salaryEntry, currentStatus):
     vacancyNameUpdate = vacancyNameEntry.get()
     vacancyDescriptionUpdate = vacancyDescriptionEntry.get("1.0", "end-1c")
-    salaryUpdate = salaryEntry.get()
+    salaryUpdate = int(salaryEntry.get())
     if(vacancyNameUpdate == '' or vacancyDescriptionUpdate == '' or salaryUpdate == ''):
         showerror(title='Ошибка', message='Заполните все данные')
     else:
@@ -74,7 +74,7 @@ def updateVacancyCollection(oldTitle, vacancyNameEntry, vacancyDescriptionEntry,
             showerror(title='Ошибка', message='Вакансия с таким именем уже зарегистрирована')
         else:
             oldValues = {'Title': oldTitle}
-            newValues = {'$set' : {'Title': vacancyNameUpdate, 'VacancyDescription': vacancyDescriptionUpdate, 'Salary': salaryUpdate, 'Status': currentStatus}}
+            newValues = {'$set' : {'Title': vacancyNameUpdate, 'VacancyDescription': vacancyDescriptionUpdate, 'Salary': salaryUpdate, 'Status': bool(currentStatus)}}
             database['DB']['VacancyDocument'].update_one(oldValues, newValues)
             showinfo(title='Инфо', message='Данные успешно обновлены')
 
@@ -85,7 +85,7 @@ def updateEmployerCollection(oldCompanyName, currentTitle, companyNameEntry, com
     companyDescriptionUpdate = companyDescriptionEntry.get("1.0", "end-1c")
     addressCityUpdate = addressCityEntry.get()
     addressStreetUpdate = addressStreetEntry.get()
-    addressHouseUpdate = addressHouseEntry.get()
+    addressHouseUpdate = int(addressHouseEntry.get())
     if(companyNameUpdate == '' or companyDescriptionUpdate == '' or addressCityUpdate == '' or addressStreetUpdate == '' or addressHouseUpdate == ''):
         showerror(title='Ошибка', message='Заполните все данные')
     else:
@@ -103,8 +103,8 @@ def updateCandidateCollection(oldName, currentTitle, candidateNameEntry, current
     record = database['DB']['VacancyDocument'].find_one({'Title': currentTitle})
     candidateNameUpdate = candidateNameEntry.get()
     dateOfBirthUpdate = dateOfBirthEntry.get()
-    stageUpdate = stageEntry.get()
-    phoneNumberUpdate = phoneNumberEntry.get()
+    stageUpdate = int(stageEntry.get())
+    phoneNumberUpdate = int(phoneNumberEntry.get())
     if(candidateNameUpdate == '' or dateOfBirthUpdate == '' or stageUpdate == ''):
         showerror(title='Ошибка', message='Заполните все данные')
     else:
@@ -155,7 +155,7 @@ def deleteCandidateCollection(name):
 def addingVacancyDenormalized(vacancyNameEntry, vacancyDescriptionEntry, salaryEntry, currentStatus):
     vacancyNameAdd = vacancyNameEntry.get()
     vacancyDescriptionAdd = vacancyDescriptionEntry.get("1.0", "end-1c")
-    salaryAdd = salaryEntry.get()
+    salaryAdd = int(salaryEntry.get())
     if(vacancyNameAdd == '' or vacancyDescriptionAdd == '' or salaryAdd == ''):
         showerror(title='Ошибка', message='Заполните все данные')
     else:
@@ -163,7 +163,7 @@ def addingVacancyDenormalized(vacancyNameEntry, vacancyDescriptionEntry, salaryE
         if existingDocument > 0:
             showerror(title='Ошибка', message='Вакансия с таким названием уже существует')
         else:
-            dictAdd = {'Title': vacancyNameAdd, 'VacancyDescription': vacancyDescriptionAdd, 'Salary': salaryAdd, 'Status': currentStatus, "Employers": [], "Candidates": []}
+            dictAdd = {'Title': vacancyNameAdd, 'VacancyDescription': vacancyDescriptionAdd, 'Salary': salaryAdd, 'Status': bool(currentStatus), "Employers": [], "Candidates": []}
             database['DB']['DenormalizedDocument'].insert_one(dictAdd)
             showinfo(title='Инфо', message='Данные успешно добавлены')
 
@@ -173,7 +173,7 @@ def addingEmployerDenormalized(currentTitle, companyNameEntry, companyDescriptio
     companyDescriptionAdd = companyDescriptionEntry.get("1.0", "end-1c")
     addressCityAdd = addressCityEntry.get()
     addressStreetAdd = addressStreetEntry.get()
-    addressHouseAdd = addressHouseEntry.get()
+    addressHouseAdd = int(addressHouseEntry.get())
     if(companyNameAdd == '' or companyDescriptionAdd == '' or addressCityAdd == '' or addressStreetAdd == '' or addressHouseAdd == ''):
         showerror(title='Ошибка', message='Заполните все данные')
     else:
@@ -195,8 +195,8 @@ def addingEmployerDenormalized(currentTitle, companyNameEntry, companyDescriptio
 def addingCandidateDenormalized(currentTitle, candidateNameEntry, currentGender, dateOfBirthEntry, stageEntry, phoneNumberEntry):
     candidateNameAdd = candidateNameEntry.get()
     dateOfBirthAdd = dateOfBirthEntry.get()
-    stageAdd = stageEntry.get()
-    phoneNumberAdd = phoneNumberEntry.get()
+    stageAdd = int(stageEntry.get())
+    phoneNumberAdd = int(phoneNumberEntry.get())
     if(candidateNameAdd == '' or dateOfBirthAdd == '' or stageAdd == '' or phoneNumberAdd == ''):
         showerror(title='Ошибка', message='Заполните все данные')
     else:
@@ -218,7 +218,7 @@ def addingCandidateDenormalized(currentTitle, candidateNameEntry, currentGender,
 def updateVacancyCollectionDenormalized(oldTitle, vacancyNameEntry, vacancyDescriptionEntry, salaryEntry, currentStatus):
     vacancyNameUpdate = vacancyNameEntry.get()
     vacancyDescriptionUpdate = vacancyDescriptionEntry.get("1.0", "end-1c")
-    salaryUpdate = salaryEntry.get()
+    salaryUpdate = int(salaryEntry.get())
     if(vacancyNameUpdate == '' or vacancyDescriptionUpdate == '' or salaryUpdate == ''):
         showerror(title='Ошибка', message='Заполните все данные')
     else:
@@ -227,7 +227,7 @@ def updateVacancyCollectionDenormalized(oldTitle, vacancyNameEntry, vacancyDescr
             showerror(title='Ошибка', message='Вакансия с таким названием уже существует')
         else:
             oldValues = {'Title': oldTitle}
-            newValues = {'$set' : {'Title': vacancyNameUpdate, 'VacancyDescription': vacancyDescriptionUpdate, 'Salary': salaryUpdate, 'Status': currentStatus}}
+            newValues = {'$set' : {'Title': vacancyNameUpdate, 'VacancyDescription': vacancyDescriptionUpdate, 'Salary': salaryUpdate, 'Status': bool(currentStatus)}}
             database['DB']['DenormalizedDocument'].update_one(oldValues, newValues)
             showinfo(title='Инфо', message='Данные успешно обновлены')
 
@@ -237,7 +237,7 @@ def updateEmployerCollectionDenormalized(currentVacancy, oldName, companyNameEnt
     companyDescriptionUpdate = companyDescriptionEntry.get("1.0", "end-1c")
     addressCityUpdate = addressCityEntry.get()
     addressStreetUpdate = addressStreetEntry.get()
-    addressHouseUpdate = addressHouseEntry.get()
+    addressHouseUpdate = int(addressHouseEntry.get())
     if(companyNameUpdate == '' or companyDescriptionUpdate == '' or addressCityUpdate == '' or addressStreetUpdate == '' or addressHouseUpdate == ''):
         showerror(title='Ошибка', message='Заполните все данные')
     else:
@@ -262,8 +262,8 @@ def updateEmployerCollectionDenormalized(currentVacancy, oldName, companyNameEnt
 def updateCandidateCollectionDenormalized(currentVacancy, oldName, candidateNameEntry, currentGender, dateOfBirthEntry, stageEntry, phoneNumberEntry):
     candidateNameUpdate = candidateNameEntry.get()
     dateOfBirthUpdate = dateOfBirthEntry.get()
-    stageUpdate = stageEntry.get()
-    phoneNumberUpdate = phoneNumberEntry.get()
+    stageUpdate = int(stageEntry.get())
+    phoneNumberUpdate = int(phoneNumberEntry.get())
     if(candidateNameUpdate == '' or dateOfBirthUpdate == '' or stageUpdate == '' or phoneNumberUpdate == ''):
         showerror(title='Ошибка', message='Заполните все данные')
     else:

@@ -2097,7 +2097,7 @@ def mainUI():
     buttonConnection.pack(pady=10)
     buttonConnection.config(font='Arial 12 bold', bg='#FFCA8A')
 
-    buttonJoin = Button(root, text='Объединить', command=buttonJoinClicked)
+    buttonJoin = Button(root, text='Объединить коллекции', command=buttonJoinClicked)
     buttonJoin.pack(pady=10)
     buttonJoin.config(font='Arial 12 bold', bg='#FFCA8A')
 
